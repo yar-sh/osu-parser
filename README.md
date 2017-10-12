@@ -5,7 +5,7 @@ Parse any osu! related file *(in theory. Right now only \*.osr (osu!replay) file
 ## Features
 - Easy API
 - No compilitaion required
-- <a href="http://unlicense.org" target="_blank">Unlicense</a>
+- <a href="http://unlicense.org" target="blank">Unlicense</a>
  
  
 ## Navigation
