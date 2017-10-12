@@ -9,15 +9,21 @@ Parse any osu! related file *(in theory. Right now only \*.osr (osu!replay) are 
  
  
 ## Navigation
+- [Requirements](#requirements)
 - [Installation](#installation)
 - [Code sample](#code-sample)
     - [Parse `*.osr`](#osr)
-- [API](#API)
-    - [Types](#API-types)
-    - [Utils](#API-utils)
-    - [OsString](#API-OsString)
-    - [OsrParser](#API-OsrParser)
+- [API](#api)
+    - [Types](#api-types)
+    - [Utils](#api-utils)
+    - [OsString](#api-OsString)
+    - [OsrParser](#api-OsrParser)
+    - [OsuParser](#api-OsuParser)
 - [TODO](#TODO)
+ 
+ 
+## Requirements
+- Has to be linked with [LZMA-SDK](http://www.7-zip.org/sdk.html)
  
  
 ## Installation
