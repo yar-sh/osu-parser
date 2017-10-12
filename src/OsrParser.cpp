@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////
 //                                                            //
 //      OsrParser.cpp                                         //
-//      HaselLoyance 2017, Unlicensed                         //
+//      HaselLoyance 2017, Unlicense                          //
 //      https://github.com/HaselLoyance/osu-parser            //
 //                                                            //
 ////////////////////////////////////////////////////////////////
@@ -36,6 +36,8 @@ OsrParser::OsrParser(ifstream * filestream)
 	actions = {};
 	unknown = 0;
 }
+
+OsrParser::~OsrParser() {};
 
 // Goes through ifstream and reads all data
 void OsrParser::Parse()
@@ -377,5 +379,3 @@ void OsrParser::_CalcActions()
 		delete[] values;
 	}
 }
-
-OsrParser::~OsrParser() {};
