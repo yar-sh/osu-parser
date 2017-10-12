@@ -1,11 +1,11 @@
 # osu!parser
-Parse any osu! related file *(in theory. Right now only \*.osr (osu!replay) are supported)*
+Parse any osu! related file *(in theory. Right now only \*.osr (osu!replay) files are supported)*
  
  
 ## Features
 - Easy API
 - No compilitaion required
-- [Unlicense](http://unlicense.org)
+- <a href="http://unlicense.org" target="_blank">Unlicense</a>
  
  
 ## Navigation
