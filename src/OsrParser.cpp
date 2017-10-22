@@ -335,25 +335,27 @@ void OsrParser::_CalcLifebar()
 	OsString data = _GetStreamString();
 
 	vector<OsString> chunks;
-	data.GetChunks(chunks);
+	data.split(",", chunks);
 
 	for (auto i = 0; i < chunks.size(); i++)
 	{
-		string * values = new string[2];
-		chunks[i].GetChunkValues(values);
+		vector<OsString> values;
+		chunks[i].split("|", values);
 
-		lifebar.push_back({
-			atoll(values[0].c_str()),
-			strtod(values[1].c_str(), nullptr)
-		});
-
-		delete[] values;
+		if (values.size() == 2)
+		{
+			lifebar.push_back({
+				atoll(values[0].c_str()),
+				strtod(values[1].c_str(), nullptr)
+			});
+		}
 	}
 }
 
 
 void OsrParser::_CalcActions()
 {
+	OsTime msSinceStart = 0;
 	uint32_t actionsLength = _GetStreamInteger();
 	vector<uint8_t> compressedBytes(actionsLength);
 	vector<uint8_t> decompressedBytes;
@@ -362,20 +364,27 @@ void OsrParser::_CalcActions()
 	DecompressLZMA(compressedBytes, decompressedBytes);
 
 	vector<OsString> chunks;
-	OsString(string(decompressedBytes.begin(), decompressedBytes.end())).GetChunks(chunks);
+	OsString(string(decompressedBytes.begin(), decompressedBytes.end())).split(",", chunks);
 
 	for (auto i = 0; i < chunks.size(); i++)
 	{
-		string * values = new string[4];
-		chunks[i].GetChunkValues(values);
+		vector<OsString> values;
+		chunks[i].split("|", values);
 
-		actions.push_back({
-			atoll(values[0].c_str()),
-			stod(values[1].c_str(), nullptr),
-			stod(values[2].c_str(), nullptr),
-			(uint8_t)strtoul(values[3].c_str(), nullptr, 10),
-		});
+		if (actions.size() > 0)
+		{
+			msSinceStart += actions.back().msSinceLast;
+		}
 
-		delete[] values;
+		if (values.size() == 4)
+		{
+			actions.push_back({
+				atoll(values[0].c_str()),
+				msSinceStart,
+				stod(values[1].c_str(), nullptr),
+				stod(values[2].c_str(), nullptr),
+				(uint8_t)strtoul(values[3].c_str(), nullptr, 10),
+			});
+		}
 	}
 }

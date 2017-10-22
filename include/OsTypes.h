@@ -27,7 +27,6 @@ namespace osuParser
 	typedef uint64_t OsLong;
 	typedef OsInteger ModMask;
 	typedef OsByte InputMask;
-	typedef std::vector<OsString> OsChunks;
 
 	// Valid keys values. Used in InputMask (OsByte). Enum values represent the bits' number 
 	// that are active in InputMask
@@ -94,13 +93,15 @@ namespace osuParser
 	};
 
 	// A replay action
-	//   msSinceLast, OsTime, time since last action
+	//   msSinceLast, OsTime, action time since last action
+	//   msSinceStart, OsTime, action time since the start of the song
 	//   x, double, x position of the cursor (in osu!pixels)
 	//   y, double, y position of the cursor (in osu!pixels)
 	//   inputs, InputMask, active inputs in this action
 	struct Action
 	{
 		OsTime msSinceLast = 0;
+		OsTime msSinceStart = 0;
 		double x = 0.0;
 		double y = 0.0;
 		InputMask inputs = 0;

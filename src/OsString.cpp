@@ -7,9 +7,11 @@
 ////////////////////////////////////////////////////////////////
 
 #include "OsString.h"
-
+#include <iostream>
 using namespace osuParser;
 using namespace std;
+
+OsString::OsString() { }
 
 OsString::OsString(const string & str)
 {
@@ -18,58 +20,24 @@ OsString::OsString(const string & str)
 
 OsString::~OsString() {};
 
-// Splits an osu string into chunks
-// Eg: "1|2|3,4|5|6" -> ["1|2|3","4|5|6"]
-//   chunks, &OsChunks, where splitted chunks will be written
-void OsString::GetChunks(OsChunks & chunks) const
+// Splits a string into multiple parts with given delimiter
+//   delimiter, string, in what places to split the string
+//   output, vector<string>, all parts of splitter string
+// Eg: "1|2|3,4|5|6" -> .split(',', output) -> ["1|2|3","4|5|5"]
+void OsString::split(const string & delim, vector<OsString> & output) const
 {
-	int pos = 0;
-	int offset = 0;
-
-	while (true)
+	size_t prev = 0, pos = 0;
+	do
 	{
-		if (operator[](pos + offset) == ',')
+		pos = find(delim, prev);
+
+		if (pos == string::npos)
 		{
-			chunks.push_back(string(&operator[](pos), &operator[](pos + offset)));
-			pos += offset + 1;
-			offset = 0;
+			pos = length();
 		}
 
-		if (pos + offset - 1 == size() - 1)
-		{
-			break;
-		}
+		output.push_back(substr(prev, pos - prev));
 
-		offset++;
-	}
-}
-
-// Splits an osu string chunks into values
-// Eg: ["1|2|3"] -> ["1","2","3"]
-//   values, string[], where splitted chunk values will be written
-void OsString::GetChunkValues(string values[]) const
-{
-	int pos = 0;
-	int offset = 0;
-	int i = 0;
-
-	while (true)
-	{
-		if (operator[](pos + offset) == '|')
-		{
-			values[i] = string(&operator[](pos), &operator[](pos + offset));
-			pos += offset + 1;
-			offset = 0;
-			i++;
-		}
-
-		if (pos + offset - 1 == size() - 1)
-		{
-			values[i] = string(&operator[](pos), &operator[](pos + offset));
-			i++;
-			break;
-		}
-
-		offset++;
-	}
+		prev = pos + delim.length();
+	} while (pos < length() && prev < length());
 }

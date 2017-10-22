@@ -21,18 +21,15 @@ namespace osuParser
 	class OsString : public std::string
 	{
 	public:
+		OsString();
 		OsString(const std::string & str);
 		~OsString();
 
-		// Splits an osu string into chunks
-		// Eg: "1|2|3,4|5|6" -> ["1|2|3","4|5|6"]
-		//   chunks, &OsChunks, where splitted chunks will be written
-		void GetChunks(OsChunks & chunks) const;
-
-		// Splits an osu string chunks into values
-		// Eg: ["1|2|3"] -> ["1","2","3"]
-		//   values, string[], where splitted chunk values will be written
-		void GetChunkValues(std::string values[]) const;
+		// Splits a string into multiple parts with given delimiter
+		//   delimiter, string, in what places to split the string
+		//   output, vector<string>, all parts of splitter string
+		// Eg: "1|2|3,4|5|6" -> .split(',', output) -> ["1|2|3","4|5|5"]
+		void OsString::split(const std::string & delim, std::vector<OsString> & output) const;
 	};
 }
 
