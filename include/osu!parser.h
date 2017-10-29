@@ -11,7 +11,6 @@
 
 #include "OsTypes.h"
 #include "OsUtils.h"
-#include "OsString.h"
 #include "OsrParser.h"
 
 #endif

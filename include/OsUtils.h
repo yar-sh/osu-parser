@@ -10,12 +10,22 @@
 #define OSU_PARSER_UTILS_H
 
 #include <vector>
+#include <string>
 
 #include "OsTypes.h"
 #include "LzmaLib.h"
 
+#define IsBitSet(variable, bitNumber) bool(variable & (1 << bitNumber))
+
 namespace osuParser
 {
+	// Splits a string into multiple parts with given delimiter
+	//   str, string, string to split
+	//   delimiter, string, in what places to split the string
+	//   output, vector<string>, all parts of splitter string
+	// Eg: SplitString("1|2|3,4|5|6", ',', output) -> ["1|2|3","4|5|6"]
+	void SplitString(const std::string & str, const std::string & delim, std::vector<std::string> & output);
+
 	// Checks if input is active in an input mask
 	//   inputs, InputMask, inputs mask
 	//   input, InputType, input to check if is active

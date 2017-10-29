@@ -11,7 +11,6 @@
 
 #include <fstream>
 #include "OsTypes.h"
-#include "OsString.h"
 #include "OsUtils.h"
 
 namespace osuParser

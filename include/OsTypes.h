@@ -9,15 +9,11 @@
 #ifndef OSU_PARSER_TYPES_H
 #define OSU_PARSER_TYPES_H
 
-#define IsBitSet(variable, bitNumber) bool(variable & (1 << bitNumber))
-
 #include <stdint.h>
 #include <vector>
 
 namespace osuParser
 {
-	class OsString;
-
 	// For readability and to follow format docs I'm typedefing all over the place
 	// NOTE: OsTime will always be represneted in milliseconds
 	typedef int64_t OsTime;

@@ -5,7 +5,8 @@ Parse any osu! related file *(in theory. Right now only \*.osr (osu!replay) file
 ## Features
 - Easy API
 - No compilitaion required
-- <a href="http://unlicense.org" target="_blank">Unlicense</a>
+- Cross-platform
+- [Unlicense](http://unlicense.org)
  
  
 ## Navigation
@@ -14,11 +15,10 @@ Parse any osu! related file *(in theory. Right now only \*.osr (osu!replay) file
 - [Code sample](#code-sample)
     - [Parse `*.osr`](#osr)
 - [API](#api)
-    - [Types](#api-types)
-    - [Utils](#api-utils)
-    - [OsString](#api-OsString)
-    - [OsrParser](#api-OsrParser)
-    - [OsuParser](#api-OsuParser)
+    - [Types](#types)
+    - [Utils](#utils)
+    - [OsrParser](#OsrParser)
+    - [OsuParser](#OsuParser)
 - [TODO](#TODO)
  
  
@@ -33,14 +33,14 @@ For Microsoft Visual Studio 2017:
  
  
 ## Code sample
-#### osr
+#### **osr** (Refer to [osr file format documentation]([osr](https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osr_(file_format)) for details)
 ```cpp
-#include "osu!parse.h"
+#include "osu!parser.h"
 #include <fstream>
 
 int main()
 {
-    std::ifstream file("file.osr", ios::binary);
+    std::ifstream file("file.osr", std::ios::binary);
     osuParser::OsrParser p(file);
     p.Parse();
     // p.[parsedValues]
@@ -49,5 +49,15 @@ int main()
  
  
 ## API
-#### Types
-    TODO
+#### **Types**
+* `typedef int64_t`**`OsTime`** representation of time in milliseconds
+* `typedef uint8_t`**`OsByte`** osr byte (1 byte)
+* `typedef uint16_t`**`OsShort`** osr short (2 bytes)
+* `typedef uint32_t`**`OsInteger`** osr integer (4 bytes)
+* `typedef uint64_t`**`OsLong`** osr long (8 bytes)
+* `typedef OsInteger`**`ModMask`** representation of active mods as a bit mask
+* `typedef OsByte`**`InputMask`** representation of active inputsas a bit mask
+* `enum`**`InputType`** valid input values, numeric values represent an active bit position in **InputMask**
+* `enum`**`ModType`** valid mod values, numeric values represent an active bit position in **ModMask**
+* `enum`**`GameMode`** valid game mode values
+

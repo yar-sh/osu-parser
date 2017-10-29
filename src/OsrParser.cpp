@@ -332,15 +332,15 @@ void OsrParser::_CalcModsStringVector()
 
 void OsrParser::_CalcLifebar()
 {
-	OsString data = _GetStreamString();
+	string data = _GetStreamString();
 
-	vector<OsString> chunks;
-	data.split(",", chunks);
+	vector<string> chunks;
+	SplitString(data, ",", chunks);
 
 	for (auto i = 0; i < chunks.size(); i++)
 	{
-		vector<OsString> values;
-		chunks[i].split("|", values);
+		vector<string> values;
+		SplitString(chunks[i], "|", values);
 
 		if (values.size() == 2)
 		{
@@ -352,7 +352,6 @@ void OsrParser::_CalcLifebar()
 	}
 }
 
-
 void OsrParser::_CalcActions()
 {
 	OsTime msSinceStart = 0;
@@ -363,13 +362,13 @@ void OsrParser::_CalcActions()
 	_s->read((char*)&compressedBytes[0], actionsLength);
 	DecompressLZMA(compressedBytes, decompressedBytes);
 
-	vector<OsString> chunks;
-	OsString(string(decompressedBytes.begin(), decompressedBytes.end())).split(",", chunks);
+	vector<string> chunks;
+	SplitString({ decompressedBytes.begin(), decompressedBytes.end() }, ",", chunks);
 
 	for (auto i = 0; i < chunks.size(); i++)
 	{
-		vector<OsString> values;
-		chunks[i].split("|", values);
+		vector<string> values;
+		SplitString(chunks[i], "|", values);
 
 		if (actions.size() > 0)
 		{
