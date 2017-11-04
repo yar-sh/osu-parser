@@ -35,11 +35,11 @@ Parse any osu! related file *(in theory. Right now only \*.osr (osu!replay) file
 ## Installation
 For Microsoft Visual Studio 2017:
 1) Add path to `include/` directory as an additional include directory to the project
-2) Add all `*.cpp` files from `src/` directory as exesting source files to the project
+2) Add all `*.cpp` files from `src/` directory as existing source files to the project
  
  
 ## Code sample
-#### **osr** (Refer to [osr file format documentation](https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osr_(file_format)) for details)
+#### **osr** 
 ```cpp
 #include "osu!parser.h"
 #include <fstream>
@@ -52,6 +52,7 @@ int main()
     // p.<parsedValues>
 }
 ```
+(Refer to [osr file format documentation](https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osr_(file_format)) for details)
  
  
 ## API
