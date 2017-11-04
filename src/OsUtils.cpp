@@ -14,12 +14,12 @@ using namespace std;
 // Splits a string into multiple parts with given delimiter
 //   str, string, string to split
 //   delimiter, string, in what places to split the string
-//   output, vector<string>, all parts of splitter string
+//   output, ref vector<string>, all parts of the splitted string
 // Eg: SplitString("1|2|3,4|5|6", ',', output) -> ["1|2|3","4|5|6"]
 void osuParser::SplitString(const string & str, const string & delim, vector<string> & output)
 {
-	auto prev = 0;
-	auto pos = 0;
+	size_t prev = 0;
+	size_t pos = 0;
 
 	do
 	{
@@ -56,11 +56,12 @@ bool osuParser::IsModActive(const ModMask & mods, const ModType & mod)
 
 // Decompress LZMA-compressed buffer
 //   inBuf, vector<uint8_t>, input buffer with LZMA-compressed bytes
-//   outBuf, &vector<uint8_t>, output buffer where decompressed data will be written
+//   outBuf, ref vector<uint8_t>, output buffer where decompressed data will be written
 void osuParser::DecompressLZMA(const vector<uint8_t> &inBuf, vector<uint8_t> & outBuf)
 {
 	outBuf.clear();
-	outBuf.resize(inBuf.size() * 4);
+	// Reserves N bytes, shrinks to fit after decompression
+	outBuf.resize(inBuf.size() * 4); //-V112
 	size_t dstLen = outBuf.size();
 	size_t srcLen = inBuf.size() - LZMA_PROPS_SIZE - 8;
 	LzmaUncompress(&outBuf[0], &dstLen, &inBuf[LZMA_PROPS_SIZE + 8], &srcLen, &inBuf[0], LZMA_PROPS_SIZE);

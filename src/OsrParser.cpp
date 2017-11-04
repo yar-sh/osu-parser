@@ -17,9 +17,9 @@ OsrParser::OsrParser(ifstream * filestream)
 	_s = filestream;
 	mode = gmStandard;
 	version = 0;
-	player = "";
-	beatmapHash = "";
-	replayHash = "";
+	player.clear();
+	beatmapHash.clear();
+	replayHash.clear();
 	n300s = 0;
 	n100s = 0;
 	n50s = 0;
@@ -102,34 +102,40 @@ uint8_t OsrParser::_GetStreamByte()
 uint16_t OsrParser::_GetStreamShort()
 {
 	uint16_t b = 0;
-	_s->read(reinterpret_cast<char *>(&b), sizeof(uint16_t));
+	_s->read((char *)&b, sizeof(uint16_t));
 	return b;
 }
 
 uint32_t OsrParser::_GetStreamInteger()
 {
 	uint32_t b = 0;
-	_s->read(reinterpret_cast<char *>(&b), sizeof(uint32_t));
+
+	// Requires explicit conversion to read bytes
+	_s->read((char *)&b, sizeof(uint32_t)); //-V206
 	return b;
 }
 
 uint64_t OsrParser::_GetStreamLong()
 {
 	uint64_t b = 0;
-	_s->read(reinterpret_cast<char *>(&b), sizeof(uint64_t));
+
+	// Requires explicit conversion to read bytes
+	_s->read((char *)&b, sizeof(uint64_t)); //-V206
 	return b;
 }
 
 uint64_t OsrParser::_GetStreamULEB128()
 {
 	uint64_t result = 0;
-	unsigned shift = 0;
+	uint8_t shift = 0;
 
 	while (true)
 	{
 		uint8_t byte = _s->get();
 
-		result |= (byte & ~(1 << 7)) << shift;
+		// In our case the size of ULEB128 can never be > 8 bytes
+		// 8*8 = 64 bits, so shift value will always be under 1 byte size
+		result |= (byte & ~(1 << 7)) << shift; //-V629
 
 		if (!IsBitSet(byte, 7))
 		{
@@ -184,6 +190,7 @@ void OsrParser::_CalcModsStringVector()
 {
 	modsStringVector.clear();
 
+	// TODO: Static array of mode names and for loop
 	if (IsBitSet(modsMask, 0))
 	{
 		modsStringVector.push_back("NoFail");
@@ -337,12 +344,11 @@ void OsrParser::_CalcLifebar()
 	vector<string> chunks;
 	SplitString(data, ",", chunks);
 
-	for (auto i = 0; i < chunks.size(); i++)
 	{
 		vector<string> values;
-		SplitString(chunks[i], "|", values);
+		SplitString(chunk, "|", values);
 
-		if (values.size() == 2)
+		if (values.size() == LIFE_BAR_POINT_LENGTH)
 		{
 			lifebar.push_back({
 				atoll(values[0].c_str()),
@@ -365,17 +371,17 @@ void OsrParser::_CalcActions()
 	vector<string> chunks;
 	SplitString({ decompressedBytes.begin(), decompressedBytes.end() }, ",", chunks);
 
-	for (auto i = 0; i < chunks.size(); i++)
+	for (auto && chunk : chunks)
 	{
 		vector<string> values;
-		SplitString(chunks[i], "|", values);
+		SplitString(chunk, "|", values);
 
 		if (actions.size() > 0)
 		{
 			msSinceStart += actions.back().msSinceLast;
 		}
 
-		if (values.size() == 4)
+		if (values.size() == ACTION_LENGTH)
 		{
 			actions.push_back({
 				atoll(values[0].c_str()),

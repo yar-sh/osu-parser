@@ -12,6 +12,9 @@
 #include <stdint.h>
 #include <vector>
 
+#define LIFE_BAR_POINT_LENGTH 2
+#define ACTION_LENGTH 4
+
 namespace osuParser
 {
 	// For readability and to follow format docs I'm typedefing all over the place
@@ -79,7 +82,7 @@ namespace osuParser
 		gmMania = 3,
 	};
 
-	// A point on a lifebar
+	// A point on the lifebar graph
 	//   timePoint, OsTime, time of the point on lifebar graph
 	//   life, double, value of the lifebar from 0.0 (empty) to 1.0 (full)
 	struct LifeBarPoint

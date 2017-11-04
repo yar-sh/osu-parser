@@ -6,8 +6,8 @@
 //                                                            //
 ////////////////////////////////////////////////////////////////
 
-#ifndef OSU_PARSER_MAIN_H
-#define OSU_PARSER_MAIN_H
+#ifndef OSU_PARSER_H
+#define OSU_PARSER_H
 
 #include "OsTypes.h"
 #include "OsUtils.h"

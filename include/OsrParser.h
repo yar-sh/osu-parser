@@ -80,18 +80,18 @@ namespace osuParser
 		// Mods used in a vector of strings
 		std::vector<std::string> modsStringVector;
 
-		// Life bar graph. Represents the amount of life you have at the given time 
+		// Life bar graph. Represents the amount of life you have at the given time
 		std::vector<LifeBarPoint> lifebar;
 
 		// Time stamp (https://msdn.microsoft.com/en-us/library/system.datetime.ticks(v=vs.110).aspx)
 		OsLong timestamp;
-		
+
 		// Vector of actions. See Action struct
 		std::vector<Action> actions;
 
 		// Last 4 bytes of replay file - unknown
 		OsLong unknown;
-		
+
 	private:
 		// Stream reading operations
 		uint8_t _GetStreamByte();
