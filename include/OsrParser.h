@@ -30,14 +30,15 @@ namespace osuParser
 		// Game mode of the replay
 		GameMode mode;
 
-		// Game mode of the replay (in string)
+		// Game mode of the replay (in string form)
 		std::string modeString;
 
-		// Version of the game when the replay was created
+		// Version of the game where the replay was created
 		OsLong version;
 
 		// osu! beatmap MD5 hash
 		std::string beatmapHash;
+
 		// Player name
 		std::string player;
 
