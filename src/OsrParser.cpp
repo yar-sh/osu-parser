@@ -214,6 +214,7 @@ void OsrParser::_CalcLifebar()
 	vector<string> chunks;
 	SplitString(data, ",", chunks);
 
+	for (auto && chunk : chunks)
 	{
 		vector<string> values;
 		SplitString(chunk, "|", values);
