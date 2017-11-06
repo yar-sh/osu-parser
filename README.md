@@ -97,7 +97,7 @@ int main()
     - *filestream*, **\*ifstream**, input file stream
 * void **Parse()**: Goes through input file stream and collects/processes data
 * const static *modNames*, **vector\<string>**, string names for each of the available mods
-After calling **.Parse()** the following data members will be filled and available:
+<br>After calling **.Parse()** the following data members will be filled and available:
     - *mode*, **GameMode**, game mode of the replay
     - *modeString*, **string**, game mode of the replay (in string form)
     - *version*, **OsLong**, version of the game where the replay was created
