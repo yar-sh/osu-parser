@@ -11,6 +11,14 @@
 using namespace std;
 using namespace osuParser;
 
+// String names for each of the available mods
+const vector<string> OsrParser::modNames = {
+	"NoFail", "Easy", "NoVideo", "Hidden", "HardRock", "SuddenDeath", "DoubleTime", "Relax",
+	"HalfTime", "Nightcore", "Flashlight", "Autoplay", "SpunOut", "Relax2", "Perfect", "Key4",
+	"Key5", "Key6", "Key7", "Key8", "FadeIn", "Random", "LastMod", "TargetPractice", "Key9",
+	"Coop", "Key1", "Key3", "key2",
+};
+
 // Creates a parser from ifstream
 OsrParser::OsrParser(ifstream * filestream)
 {
@@ -177,7 +185,7 @@ void OsrParser::_CalcModsVector()
 {
 	modsVector.clear();
 
-	for (int i = 0; i < sizeof(modsMask); i++)
+	for (auto i = 0; i < sizeof(modsMask); i++)
 	{
 		if (IsBitSet(modsMask, i))
 		{
@@ -190,150 +198,12 @@ void OsrParser::_CalcModsStringVector()
 {
 	modsStringVector.clear();
 
-	// TODO: Static array of mode names and for loop
-	if (IsBitSet(modsMask, 0))
+	for (auto i = 0; i < modNames.size(); i++)
 	{
-		modsStringVector.push_back("NoFail");
-	}
-
-	if (IsBitSet(modsMask, 1))
-	{
-		modsStringVector.push_back("Easy");
-	}
-
-	if (IsBitSet(modsMask, 2))
-	{
-		modsStringVector.push_back("NoVideo");
-	}
-
-	if (IsBitSet(modsMask, 3))
-	{
-		modsStringVector.push_back("Hidden");
-	}
-
-	if (IsBitSet(modsMask, 4))
-	{
-		modsStringVector.push_back("HardRock");
-	}
-
-	if (IsBitSet(modsMask, 5))
-	{
-		modsStringVector.push_back("SuddenDeath");
-	}
-
-	if (IsBitSet(modsMask, 6))
-	{
-		modsStringVector.push_back("DoubleTime");
-	}
-
-	if (IsBitSet(modsMask, 7))
-	{
-		modsStringVector.push_back("Relax");
-	}
-
-	if (IsBitSet(modsMask, 8))
-	{
-		modsStringVector.push_back("HalfTime");
-	}
-
-	if (IsBitSet(modsMask, 9))
-	{
-		modsStringVector.push_back("Nightcore");
-	}
-
-	if (IsBitSet(modsMask, 10))
-	{
-		modsStringVector.push_back("Flashlight");
-	}
-
-	if (IsBitSet(modsMask, 11))
-	{
-		modsStringVector.push_back("Autoplay");
-	}
-
-	if (IsBitSet(modsMask, 12))
-	{
-		modsStringVector.push_back("SpunOut");
-	}
-
-	if (IsBitSet(modsMask, 13))
-	{
-		modsStringVector.push_back("Relax2");
-	}
-
-	if (IsBitSet(modsMask, 14))
-	{
-		modsStringVector.push_back("Perfect");
-	}
-
-	if (IsBitSet(modsMask, 15))
-	{
-		modsStringVector.push_back("Key4");
-	}
-
-	if (IsBitSet(modsMask, 16))
-	{
-		modsStringVector.push_back("Key5");
-	}
-
-	if (IsBitSet(modsMask, 17))
-	{
-		modsStringVector.push_back("Key6");
-	}
-
-	if (IsBitSet(modsMask, 18))
-	{
-		modsStringVector.push_back("Key7");
-	}
-
-	if (IsBitSet(modsMask, 19))
-	{
-		modsStringVector.push_back("Key8");
-	}
-
-	if (IsBitSet(modsMask, 20))
-	{
-		modsStringVector.push_back("FadeIn");
-	}
-
-	if (IsBitSet(modsMask, 21))
-	{
-		modsStringVector.push_back("Random");
-	}
-
-	if (IsBitSet(modsMask, 22))
-	{
-		modsStringVector.push_back("LastMod");
-	}
-
-	if (IsBitSet(modsMask, 23))
-	{
-		modsStringVector.push_back("TargetPractice");
-	}
-
-	if (IsBitSet(modsMask, 24))
-	{
-		modsStringVector.push_back("Key9");
-	}
-
-	if (IsBitSet(modsMask, 25))
-	{
-		modsStringVector.push_back("Coop");
-	}
-
-	if (IsBitSet(modsMask, 26))
-	{
-		modsStringVector.push_back("Key1");
-	}
-
-	if (IsBitSet(modsMask, 27))
-	{
-		modsStringVector.push_back("Key3");
-	}
-
-	if (IsBitSet(modsMask, 28))
-	{
-		modsStringVector.push_back("Key2");
+		if (IsBitSet(modsMask, i))
+		{
+			modsStringVector.push_back(modNames[i]);
+		}
 	}
 }
 

@@ -20,6 +20,9 @@ namespace osuParser
 	class OsrParser
 	{
 	public:
+		// String names for each of the available mods
+		const static std::vector<std::string> modNames;
+
 		// Creates a parser from ifstream
 		OsrParser(std::ifstream * filestream);
 		~OsrParser();
@@ -72,7 +75,7 @@ namespace osuParser
 		// Perfect/full combo (1 = no misses and no slider breaks and no early finished sliders)
 		bool isFC;
 
-		// Mods used. Stored as bit values in a mask. See IsModActive and ModType
+		// Mods used. See IsModActive and ModType
 		ModMask modsMask;
 
 		// Mods used in a vector of ModType
