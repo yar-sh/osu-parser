@@ -9,7 +9,6 @@
 #ifndef OSU_PARSER_TYPES_H
 #define OSU_PARSER_TYPES_H
 
-#include <stdint.h>
 #include <vector>
 
 #define LIFE_BAR_POINT_LENGTH 2
@@ -83,11 +82,11 @@ namespace osuParser
 	};
 
 	// A point on the lifebar graph
-	//   timePoint, OsTime, time of the point on lifebar graph
+	//   time, OsTime, time of the point on lifebar graph
 	//   life, double, value of the lifebar from 0.0 (empty) to 1.0 (full)
 	struct LifeBarPoint
 	{
-		OsTime timePoint = 0;
+		OsTime time = 0;
 		double life = 0.0;
 	};
 

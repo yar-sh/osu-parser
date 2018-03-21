@@ -1,17 +1,25 @@
 ////////////////////////////////////////////////////////////////
 //                                                            //
-//      osu!parser.h                                          //
+//      OsuParser.cpp                                         //
 //      HaselLoyance 2017, Unlicense                          //
 //      https://github.com/HaselLoyance/osu-parser            //
 //                                                            //
 ////////////////////////////////////////////////////////////////
 
-#ifndef OSU_PARSER_H
-#define OSU_PARSER_H
-
-#include "OsTypes.h"
-#include "OsUtils.h"
-#include "OsrParser.h"
 #include "OsuParser.h"
 
-#endif
+using namespace std;
+using namespace osuParser;
+
+// Creates a parser from ifstream
+OsuParser::OsuParser(istream * filestream)
+{
+	_s = filestream;
+}
+
+OsuParser::~OsuParser() {};
+
+// Goes through ifstream and reads all data
+void OsuParser::Parse()
+{
+}

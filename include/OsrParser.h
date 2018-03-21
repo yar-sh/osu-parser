@@ -9,7 +9,6 @@
 #ifndef OSU_PARSER_OSR_H
 #define OSU_PARSER_OSR_H
 
-#include <fstream>
 #include "OsTypes.h"
 #include "OsUtils.h"
 
@@ -20,11 +19,8 @@ namespace osuParser
 	class OsrParser
 	{
 	public:
-		// String names for each of the available mods
-		const static std::vector<std::string> modNames;
-
-		// Creates a parser from ifstream
-		OsrParser(std::ifstream * filestream);
+		// Creates a parser from input data stream
+		OsrParser(std::istream * filestream);
 		~OsrParser();
 
 		// Goes through ifstream and assigns data
@@ -107,14 +103,13 @@ namespace osuParser
 
 		// Data extraction which requires more work than just
 		// reading byte values
-		void _CalcGameModeString();
 		void _CalcModsVector();
 		void _CalcModsStringVector();
 		void _CalcLifebar();
 		void _CalcActions();
 
-		// Pointer to the passed ifstream in constructor
-		std::ifstream * _s;
+		// Pointer to the passed data stream in constructor
+		std::istream * _s;
 	};
 }
 #endif

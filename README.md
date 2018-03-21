@@ -18,9 +18,9 @@ Parse any osu! related file *(in theory. Right now only \*.osr (osu!replay) file
 - [API](#api)
     - [Types](#types)
     - [Utils](#utils)
-    - [OsrParser](#OsrParser)
-    - [OsuParser](#OsuParser)
-- [TODO](#TODO)
+    - [OsrParser](#osrparser)
+    - [OsuParser](#osuparser)
+- [TODO](#todo)
  
   
 ## Status
@@ -39,14 +39,14 @@ For Microsoft Visual Studio 2017:
  
  
 ## Code sample
-#### **osr** 
+#### **osr**
 ```cpp
 #include "osu!parser.h"
 #include <fstream>
 
 int main()
 {
-    std::ifstream file("file.osr", std::ios::binary);
+    std::ifstream file("replay.osr", std::ios::binary);
     osuParser::OsrParser p(file);
     p.Parse();
     // p.<parsedValues>
@@ -68,16 +68,16 @@ int main()
 * **ModType**, enum, valid mod values, numeric values represent an active bit position in **ModMask**
 * **GameMode**, enum, valid game mode values
 * **LifeBarPoint**, struct, represents a point on the liferbar graph:
-    - *timePoint*, **OsTime**, time of the point on lifebar graph
+    - *time*, **OsTime**, time of the point on lifebar graph
     - *life*, **double**, value of the lifebar from 0.0 (empty) to 1.0 (full)
-* **Action** struct, represents a replay action:
+* **Action**, struct, represents a replay action:
     - *msSinceLast*, **OsTime**, time since last action
     - *msSinceStart*, **OsTime**, time since the start of the song
     - *x*, **double**, x position of the cursor (in osu!pixels)
     - *y*, **double**, y position of the cursor (in osu!pixels)
     - *inputs*, **InputMask**, active inputs in this action
 #### **Utils**
-* void **SplitString(str, delimiter, output)**: Splits a string into multiple parts with given delimiter 
+* void **SplitString(str, delimiter, output)**: Splits a string into multiple parts with given delimiter
     - *str*, **string**, string to split
     - *delimiter*, **string**, in what places to split the string
     - *output*, **ref vector\<string>**, all parts of the splitted string
@@ -89,14 +89,21 @@ int main()
 <br>Returns true if mod is active in a mod mask, false otherwise
     - *mods*, **ModMask**, mods mask
     - *mod*, **ModType**, mod to check if is active
-* void **DecompressLZMA(inBuf, outBuf)**: Decompress LZMA-compressed buffer 
+* void **DecompressLZMA(inBuf, outBuf)**: Decompress LZMA-compressed buffer
     - *inBuf*, **vector\<uint8_t>**, input buffer with LZMA-compressed bytes
     - *outBuf*, **ref vector\<uint8_t>**, output buffer where decompressed data will be written
+* string **ModeToString(mode)**: String value of the game mode name
+<br>Returns a string representation of the game mode value
+    - *mode*, **GameMode**, value of the game mode
+* string **ModToString(mod)**: String value of the mod name
+<br>Returns a string representation of the mod value
+    - *mod*, **ModType**, mod value
+* const *_modNames*, **vector\<string>**, string names for each of the available mods
+* const *_modeNames*, **vector\<string>**, string names for each of the game modes
 #### **OsrParser**
 * constructor **OsrParser(filestream)**: Constructs an object for parsing "*.osr" files from preloaded stream
-    - *filestream*, **\*ifstream**, input file stream
-* void **Parse()**: Goes through input file stream and collects/processes data
-* const static *modNames*, **vector\<string>**, string names for each of the available mods
+    - *filestream*, **\*istream**, input data stream
+* void **Parse()**: Goes through input data stream and collects/processes data
 <br>After calling **.Parse()** the following data members will be filled and available:
     - *mode*, **GameMode**, game mode of the replay
     - *modeString*, **string**, game mode of the replay (in string form)

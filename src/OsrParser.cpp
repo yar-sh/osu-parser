@@ -11,16 +11,8 @@
 using namespace std;
 using namespace osuParser;
 
-// String names for each of the available mods
-const vector<string> OsrParser::modNames = {
-	"NoFail", "Easy", "NoVideo", "Hidden", "HardRock", "SuddenDeath", "DoubleTime", "Relax",
-	"HalfTime", "Nightcore", "Flashlight", "Autoplay", "SpunOut", "Relax2", "Perfect", "Key4",
-	"Key5", "Key6", "Key7", "Key8", "FadeIn", "Random", "LastMod", "TargetPractice", "Key9",
-	"Coop", "Key1", "Key3", "key2",
-};
-
 // Creates a parser from ifstream
-OsrParser::OsrParser(ifstream * filestream)
+OsrParser::OsrParser(istream * filestream)
 {
 	_s = filestream;
 	mode = gmStandard;
@@ -54,7 +46,7 @@ void OsrParser::Parse()
 
 	mode = static_cast<GameMode>(_GetStreamByte());
 
-	_CalcGameModeString();
+	modeString = ModeToString(mode);
 
 	version = _GetStreamInteger();
 
@@ -169,18 +161,6 @@ string OsrParser::_GetStreamString()
 	return output;
 }
 
-void OsrParser::_CalcGameModeString()
-{
-	switch (mode)
-	{
-	case gmStandard: modeString = "Standard"; break;
-	case gmTaiko: modeString = "Taiko"; break;
-	case gmCTB: modeString = "Catch The Beat"; break;
-	case gmMania: modeString = "Mania"; break;
-	default: modeString = "Unknown"; break;
-	}
-}
-
 void OsrParser::_CalcModsVector()
 {
 	modsVector.clear();
@@ -198,11 +178,12 @@ void OsrParser::_CalcModsStringVector()
 {
 	modsStringVector.clear();
 
-	for (auto i = 0; i < modNames.size(); i++)
+	for (size_t i = 0; i < _modNames.size(); i++)
 	{
 		if (IsBitSet(modsMask, i))
 		{
-			modsStringVector.push_back(modNames[i]);
+			auto modTypeVal = static_cast<ModType>(i);
+			modsStringVector.push_back(ModToString(modTypeVal));
 		}
 	}
 }

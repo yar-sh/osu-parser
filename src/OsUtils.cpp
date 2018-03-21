@@ -67,3 +67,29 @@ void osuParser::DecompressLZMA(const vector<uint8_t> &inBuf, vector<uint8_t> & o
 	LzmaUncompress(&outBuf[0], &dstLen, &inBuf[LZMA_PROPS_SIZE + 8], &srcLen, &inBuf[0], LZMA_PROPS_SIZE);
 	outBuf.resize(dstLen);
 }
+
+// String value of the game mode name
+//   mode, GameMode, value of the game mode
+// Returns a string representation of the game mode value
+string osuParser::ModeToString(GameMode & mode)
+{
+	if (mode < 0 || mode > 3)
+	{
+		return "Unknown";
+	}
+
+	return _modeNames[mode];
+}
+
+// String value of the mod name
+//   mod, ModType, mod value
+// Returns a string representation of the mod value
+string osuParser::ModToString(ModType & mod)
+{
+	if (mod < 0 || mod > 3)
+	{
+		return "Unknown";
+	}
+
+	return _modNames[mod];
+}
