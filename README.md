@@ -1,10 +1,12 @@
 # osu!parser
 Parse any osu! related file *(in theory. Right now only \*.osr (osu!replay) files are supported)*
+**ah yes the partial support of beatmaps is here, enjoy**
+**NOTE: docs in README are not up to date. Refer to comments in code for now**
  
  
 ## Features
 - Easy API
-- No compilitaion required
+- No compilation required
 - Cross-platform
 - [Unlicense](http://unlicense.org)
  
@@ -130,6 +132,6 @@ int main()
  
  
 ## TODO
-- Parse .osu beatmaps
+- Parse .osu beatmaps (WIP)
 - Parse .db files
 - Test other game modes
