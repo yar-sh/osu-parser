@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////
 //                                                            //
 //      osu!parser.h                                          //
-//      HaselLoyance 2017, Unlicense                          //
+//      HaselLoyance 2017-2018, Unlicense                     //
 //      https://github.com/HaselLoyance/osu-parser            //
 //                                                            //
 ////////////////////////////////////////////////////////////////

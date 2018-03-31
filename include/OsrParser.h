@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////
 //                                                            //
 //      OsrParser.h                                           //
-//      HaselLoyance 2017, Unlicense                          //
+//      HaselLoyance 2017-2018, Unlicense                     //
 //      https://github.com/HaselLoyance/osu-parser            //
 //                                                            //
 ////////////////////////////////////////////////////////////////
@@ -23,7 +23,7 @@ namespace osuParser
 		OsrParser(std::istream * filestream);
 		~OsrParser();
 
-		// Goes through ifstream and assigns data
+		// Goes through istream and assigns data
 		void Parse();
 
 		// Game mode of the replay

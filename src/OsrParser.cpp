@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////
 //                                                            //
 //      OsrParser.cpp                                         //
-//      HaselLoyance 2017, Unlicense                          //
+//      HaselLoyance 2017-2018, Unlicense                     //
 //      https://github.com/HaselLoyance/osu-parser            //
 //                                                            //
 ////////////////////////////////////////////////////////////////
@@ -39,14 +39,14 @@ OsrParser::OsrParser(istream * filestream)
 
 OsrParser::~OsrParser() {};
 
-// Goes through ifstream and reads all data
+// Goes through istream and reads all data
 void OsrParser::Parse()
 {
 	_s->seekg(0);
 
 	mode = static_cast<GameMode>(_GetStreamByte());
 
-	modeString = ModeToString(mode);
+	modeString = EnumToString<GameMode>(mode, _modeNames);
 
 	version = _GetStreamInteger();
 
@@ -183,7 +183,7 @@ void OsrParser::_CalcModsStringVector()
 		if (IsBitSet(modsMask, i))
 		{
 			auto modTypeVal = static_cast<ModType>(i);
-			modsStringVector.push_back(ModToString(modTypeVal));
+			modsStringVector.push_back(EnumToString<ModType>(modTypeVal, _modNames));
 		}
 	}
 }

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////
 //                                                            //
 //      OsUtils.h                                             //
-//      HaselLoyance 2017, Unlicense                          //
+//      HaselLoyance 2017-2018, Unlicense                     //
 //      https://github.com/HaselLoyance/osu-parser            //
 //                                                            //
 ////////////////////////////////////////////////////////////////
@@ -9,8 +9,10 @@
 #ifndef OSU_PARSER_UTILS_H
 #define OSU_PARSER_UTILS_H
 
+#include <algorithm>
+#include <cctype>
 #include <string>
-
+#include <math.h>
 #include "OsTypes.h"
 #include "LzmaLib.h"
 
@@ -24,6 +26,10 @@ namespace osuParser
 	//   output, ref vector<string>, all parts of the splitted string
 	// Eg: SplitString("1|2|3,4|5|6", ',', output) -> ["1|2|3","4|5|6"]
 	void SplitString(const std::string & str, const std::string & delim, std::vector<std::string> & output);
+
+	// Trims (removes whitespace) passed string
+	//   str, ref string, string to trim
+	void TrimString(std::string & str);
 
 	// Checks if input is active in an input mask
 	//   inputs, InputMask, inputs mask
@@ -42,28 +48,70 @@ namespace osuParser
 	//   outBuf, ref vector<uint8_t>, output buffer where decompressed data will be written
 	void DecompressLZMA(const std::vector<uint8_t> &inBuf, std::vector<uint8_t> & outBuf);
 
-	// String value of the game mode name
-	//   mode, GameMode, value of the game mode
-	// Returns a string representation of the game mode value
-	std::string ModeToString(GameMode & mode);
-
-	// String value of the mod name
-	//   mod, ModType, mod value
-	// Returns a string representation of the mod value
-	std::string ModToString(ModType & mod);
-
+	// Check to see if two double values are equal
+	//   a, double, first value to check
+	//   b, double, second value to check
+	// Returns true if both values are equal, false otherwise
+	bool IsEqualDouble(const double & a, const double & b);
+	
 	// String names for each of the available mods
-	const std::vector<std::string> _modNames = {
-		"NoFail", "Easy", "NoVideo", "Hidden", "HardRock", "SuddenDeath", "DoubleTime", 
-		"Relax", "HalfTime", "Nightcore", "Flashlight", "Autoplay", "SpunOut", "Relax2", 
-		"Perfect", "Key4", "Key5", "Key6", "Key7", "Key8", "FadeIn", "Random", "LastMod", 
-		"TargetPractice", "Key9", "Coop", "Key1", "Key3", "key2",
-	};
+	const extern std::vector<std::string> _modNames;
 
 	// String names for each of the available game modes
-	const std::vector<std::string> _modeNames = {
-		"Standard", "Taiko", "Catch The Beat", "Mania"
-	};
+	const extern std::vector<std::string> _modeNames;
+
+	// String names for each of the available sample sets
+	const extern std::vector<std::string> _sampleSetNames;
+
+	// String names for each of the available beatmap events
+	const extern std::vector<std::string> _eventNames;
+
+	// String names for each of the available hit object types
+	const extern std::vector<std::string> _hitObjectNames;
+
+	// String names for each of the available hit sound types
+	const extern std::vector<std::string> _hitSoundNames;
+
+	// Converts any enumerated type value to the string from 
+	// associated vector of string values
+	// <T>: enumerated type
+	//   val, T, value of the enumerated type
+	//   names, vector<string>, dictionary of string values for enum
+	//   defaultTo, string, what to default return value to if there is 
+	//     no associated string value, defaults to "Unknown"
+	// Returns a string representation of the enumerated type value
+	template<typename T>
+	std::string EnumToString(const T & val, const std::vector<std::string> & names, const std::string & defaultTo = "Unknown")
+	{
+		if (val < 0 || val > names.size())
+		{
+			return defaultTo;
+		}
+
+		return names[val];
+	}
+
+	// Converts string value to any enumerated type value via
+	// associated vector of string values
+	// <T>: enumerated type
+	//   val, string, string value
+	//   names, vector<string>, dictionary of string values for enum
+	//   defaultTo, T, what to default return value to if there is 
+	//     no associated enumerated type value, defaults to T(0)
+	// Returns a T representation of the string value
+	template<typename T>
+	T StringToEnum(const std::string & val, const std::vector<std::string> & names, const T & defaultTo = static_cast<T>(0))
+	{
+		for (size_t i = 0; i < names.size(); i++)
+		{
+			if (names[i] == val)
+			{
+				return static_cast<T>(i);
+			}
+		}
+
+		return defaultTo;
+	}
 }
 
 #endif

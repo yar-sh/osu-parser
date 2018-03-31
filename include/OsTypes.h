@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////
 //                                                            //
 //      OsTypes.h                                             //
-//      HaselLoyance 2017, Unlicense                          //
+//      HaselLoyance 2017-2018, Unlicense                     //
 //      https://github.com/HaselLoyance/osu-parser            //
 //                                                            //
 ////////////////////////////////////////////////////////////////
@@ -17,7 +17,7 @@
 namespace osuParser
 {
 	// For readability and to follow format docs I'm typedefing all over the place
-	// NOTE: OsTime will always be represneted in milliseconds
+	// NOTE: OsTime will always be represented in milliseconds
 	typedef int64_t OsTime;
 	typedef uint8_t OsByte;
 	typedef uint16_t OsShort;
@@ -25,6 +25,11 @@ namespace osuParser
 	typedef uint64_t OsLong;
 	typedef OsInteger ModMask;
 	typedef OsByte InputMask;
+
+	// Some typedefs for osu beatmap structure
+	typedef std::pair<std::string, std::vector<std::string>> OsSection;
+	typedef std::vector<OsSection> OsBeatmap;
+	typedef OsByte HitSoundMask;
 
 	// Valid keys values. Used in InputMask (OsByte). Enum values represent the bits' number 
 	// that are active in InputMask
@@ -81,6 +86,45 @@ namespace osuParser
 		gmMania = 3,
 	};
 
+	// Valid sample sets values
+	enum SampleSet
+	{
+		ssAuto = 0,
+		ssNormal = 1,
+		ssSoft = 2,
+		ssDrum = 3,
+	};
+
+	// Valid events for beatmap [Events] section
+	// TODO (not a priority): possible support of storyboards?
+	enum EventType
+	{
+		eBackground = 0,
+		eVideo = 1,
+		eBreak = 2,
+		eUnknown = 3,
+	};
+
+	// Valid hit object values for beatmap [HitObjects] section
+	// THERE ARE SPECIFIC REASONS WHY I USE 'o' AS A PREFIX, PLEASE UNDERSTAND
+	enum HitObjectType
+	{
+		oCircle = 0,
+		oSlider = 1,
+		oSpinner = 2,
+		oHoldNote = 3,
+	};
+
+	// Valid hit sounds values. Used in HitSoundMask (OsByte). Enum values represent the bits' number 
+	// that are active in HitSoundMask
+	enum HitSoundType
+	{
+		hsNormal = 0,
+		hsWhistle = 1,
+		hsFinish = 2,
+		hsClap = 3,
+	};
+
 	// A point on the lifebar graph
 	//   time, OsTime, time of the point on lifebar graph
 	//   life, double, value of the lifebar from 0.0 (empty) to 1.0 (full)
@@ -103,6 +147,82 @@ namespace osuParser
 		double x = 0.0;
 		double y = 0.0;
 		InputMask inputs = 0;
+	};
+
+	// A beatmap event in [Events] section
+	//   type, EventType, type of the event
+	//   file, string, name of the file that is specified for event
+	//   beginMs, OsTime, when event should begin
+	//   endMs, OsTime, when event should end
+	struct Event
+	{
+		EventType type = eBackground;
+		std::string file = "";
+		OsTime beginMs = 0;
+		OsTime endMs = 0;
+	};
+
+	// A beatmap timing point in [TimingPoints] section
+	//   offset, OsTime, when the timing point starts
+	//   msPerBeat, double, defines the duration of one beat. When positive, it is 
+	//     faithful to its name. When negative, it is a percentage of previous 
+	//     non-negative milliseconds per beat, which is stored in adjustedMsPerBeat
+	//   adjustedMsPerBeat, double, adjusted duration of each bit based on the sign
+	//     of msPerBeat
+	//   beatsPerMeasure, uint8_t, number of beats in a measure
+	//   sampleSet, SampleSet, default sample set for hit objects
+	//   sampleIndex, uint8_t, default custom index
+	//   isInheritable, bool, tells if the timing point can be inherited from
+	//   is KiaiMode, bool, whether or not Kiai Time effects are active
+	struct TimingPoint
+	{
+		OsTime offset = 0;
+		double msPerBeat = 500.0;
+		double adjustedMsPerBeat = 500.0;
+		uint8_t beatsPerMeasure = 4;
+		SampleSet sampleSet = ssNormal;
+		uint8_t sampleIndex = 0;
+		uint8_t volume = 100;
+		bool isInheritable = true;
+		bool isKiaiMode = false;
+	};
+
+	// A beatmap combo color in [Colours] section
+	//   r, uint8_t, value of red channel
+	//   g, uint8_t, value of green channel
+	//   b, uint8_t, value of blue channel
+	//   a, uint8_t, value of alpha channel
+	struct RGBAColor
+	{
+		uint8_t r = 0;
+		uint8_t g = 0;
+		uint8_t b = 0;
+		uint8_t a = 255;
+	};
+
+	// A beatmap hit object in [HitObjects] section
+	// NOTE: 
+	/*
+	To map these coordinates for a standard 640x480 screen, you need to add 
+	64 pixels to x and 48 pixels to y to respect a uniform padding. Without 
+	the padding, an object at (0, 0) will be cut on the top left for the screen.
+	*/
+	//   x, double, x position of the center of the hit object in osu!pixels
+	//   y, double, y position of the center of the hit object in osu!pixels
+	//   time, OsTime, number of milliseconds from the beginning of the song, and 
+	//     specifies when the hit begins
+	//   type, HitObjectType, type of the hit object
+	//   hitSound, HitSoundMask, sounds to play when the hit object is successfully hit
+	//   isNewCombo, bool, whether or not this hit object starts a new combo
+	//   TODO (not a priority): count bits 4-6 of type to skip N number of combo colors
+	struct HitObject
+	{
+		double x = 0.0;
+		double y = 0.0;
+		OsTime time = 0;
+		HitObjectType type = oCircle;
+		HitSoundMask hitSound = hsNormal;
+		bool isNewCombo = false;
 	};
 }
 

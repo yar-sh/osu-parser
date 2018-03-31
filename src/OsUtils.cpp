@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////
 //                                                            //
 //      OsUtils.cpp                                           //
-//      HaselLoyance 2017, Unlicense                          //
+//      HaselLoyance 2017-2018, Unlicense                     //
 //      https://github.com/HaselLoyance/osu-parser            //
 //                                                            //
 ////////////////////////////////////////////////////////////////
@@ -21,7 +21,7 @@ void osuParser::SplitString(const string & str, const string & delim, vector<str
 	size_t prev = 0;
 	size_t pos = 0;
 
-	do
+	while (true)
 	{
 		pos = str.find(delim, prev);
 
@@ -33,7 +33,20 @@ void osuParser::SplitString(const string & str, const string & delim, vector<str
 		output.push_back(str.substr(prev, pos - prev));
 
 		prev = pos + delim.length();
-	} while (pos < str.length() && prev < str.length());
+
+		if (pos >= str.length() || prev >= str.length())
+		{
+			break;
+		}
+	}
+}
+
+// Trims (removes whitespace) passed string
+//   str, ref string, string to trim
+void osuParser::TrimString(string & str) {
+	str.erase(str.begin(), find_if(str.begin(), str.end(), [](int ch) {
+		return !isspace(static_cast<unsigned char>(ch));
+	}));
 }
 
 // Checks if input is active in an input mask
@@ -68,28 +81,44 @@ void osuParser::DecompressLZMA(const vector<uint8_t> &inBuf, vector<uint8_t> & o
 	outBuf.resize(dstLen);
 }
 
-// String value of the game mode name
-//   mode, GameMode, value of the game mode
-// Returns a string representation of the game mode value
-string osuParser::ModeToString(GameMode & mode)
+// Check to see if two double values are equal
+//   a, double, first value to check
+//   b, double, second value to check
+// Returns true if both values are equal, false otherwise
+bool osuParser::IsEqualDouble(const double & a, const double & b)
 {
-	if (mode < 0 || mode > 3)
-	{
-		return "Unknown";
-	}
-
-	return _modeNames[mode];
+	return fabs(a - b) < DBL_EPSILON;
 }
 
-// String value of the mod name
-//   mod, ModType, mod value
-// Returns a string representation of the mod value
-string osuParser::ModToString(ModType & mod)
-{
-	if (mod < 0 || mod > 3)
-	{
-		return "Unknown";
-	}
+// String names for each of the available mods
+const vector<string> osuParser::_modNames = {
+	"NoFail", "Easy", "NoVideo", "Hidden", "HardRock", "SuddenDeath", "DoubleTime",
+	"Relax", "HalfTime", "Nightcore", "Flashlight", "Autoplay", "SpunOut", "Relax2",
+	"Perfect", "Key4", "Key5", "Key6", "Key7", "Key8", "FadeIn", "Random", "LastMod",
+	"TargetPractice", "Key9", "Coop", "Key1", "Key3", "Key2",
+};
 
-	return _modNames[mod];
-}
+// String names for each of the available game modes
+const vector<string> osuParser::_modeNames = {
+	"Standard", "Taiko", "Catch The Beat", "Mania"
+};
+
+// String names for each of the available sample sets
+const vector<string> osuParser::_sampleSetNames = {
+	"Auto", "Normal", "Soft", "Drum"
+};
+
+// String names for each of the available beatmap events
+const vector<string> osuParser::_eventNames = {
+	"Background", "Video", "Break", "Unknown"
+};
+
+// String names for each of the available hit object types
+const vector<string> osuParser::_hitObjectNames = {
+	"Circle", "Slider", "Spinner", "HoldNote"
+};
+
+// String names for each of the available hit sound types
+const vector<string> osuParser::_hitSoundNames = {
+	"Normal", "Whistle", "Finish", "Clap"
+};
