@@ -31,7 +31,6 @@ OsrParser::OsrParser(istream * stream)
 	isFC = false;
 	modsMask = 0;
 	modsVector = {};
-	modsStringVector = {};
 	timestamp = 0;
 	actions = {};
 	unknown = 0;
@@ -45,9 +44,7 @@ void OsrParser::Parse()
 	_s->seekg(0);
 
 	mode = static_cast<GameMode>(_GetStreamByte());
-
-	modeString = EnumToString<GameMode>(mode, _modeNames);
-
+	
 	version = _GetStreamInteger();
 
 	beatmapHash = _GetStreamString();
@@ -77,9 +74,7 @@ void OsrParser::Parse()
 	modsMask = _GetStreamInteger();
 
 	_CalcModsVector();
-
-	_CalcModsStringVector();
-
+	
 	_CalcLifebar();
 
 	timestamp = _GetStreamLong();
@@ -170,20 +165,6 @@ void OsrParser::_CalcModsVector()
 		if (IsBitSet(modsMask, i))
 		{
 			modsVector.push_back(static_cast<ModType>(i));
-		}
-	}
-}
-
-void OsrParser::_CalcModsStringVector()
-{
-	modsStringVector.clear();
-
-	for (size_t i = 0; i < _modNames.size(); i++)
-	{
-		if (IsBitSet(modsMask, i))
-		{
-			auto modTypeVal = static_cast<ModType>(i);
-			modsStringVector.push_back(EnumToString<ModType>(modTypeVal, _modNames));
 		}
 	}
 }

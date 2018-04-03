@@ -21,10 +21,10 @@ namespace osuParser
 	{
 	public:
 		// Creates a parser from input data stream
-		OsuParser(std::istream * filestream);
+		OsuParser(std::istream * stream);
 		~OsuParser();
 
-		// Goes through istream and assigns data
+		// Goes through istream and reads all data
 		void Parse();
 
 		// Version of beatmap file
@@ -160,6 +160,7 @@ namespace osuParser
 		// Vector of the colors of the combos
 		std::vector<RGBAColor> colors;
 
+		// Vector of all the hit objects in a beatmap
 		std::vector<HitObject> hitObjects;
 
 	private:
@@ -172,9 +173,15 @@ namespace osuParser
 		template<typename T>
 		std::vector<T> _ParseSectionFieldAsList(const OsSection & section, const std::string & fieldName, const std::string & delim);
 		Event _ParseFieldAsEvent(const std::string & field);
-		TimingPoint _ParseFieldAsTimingPoint(std::vector<double> & msPerBeats, const std::string & field);
+		TimingPoint _ParseFieldAsTimingPoint(const std::string & field);
 		RGBAColor _ParseFieldAsRGBAColor(const std::string & field);
 		HitObject _ParseFieldAsHitObject(const std::string & field);
+		void _ExtractExtras(const std::string & s, HitObject & o);
+
+		// When hit objects' extras are adjusted based on inheritance from
+		//   timing points this counter is used, so there are no three leveled
+		//   references through methods
+		size_t _tpIndex;
 
 		// Structure of all of the sections of the beatmap with all fields
 		OsBeatmap _b;

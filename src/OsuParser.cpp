@@ -8,13 +8,69 @@
 
 #include "OsuParser.h"
 
+// TODO: when parsing args in stringstream maybe use SplitString instead
+
 using namespace std;
 using namespace osuParser;
 
-// Creates a parser from ifstream
-OsuParser::OsuParser(istream * filestream)
+// Creates a parser from istream
+OsuParser::OsuParser(istream * stream)
 {
-	_s = filestream;
+	_s = stream;
+	formatVersion = 0;
+	audioFilename.clear();
+	audioLeadIn = 0;
+	previewTime = 0;
+	countdown = false;
+	sampleSet = ssAuto;
+	stackLeniency = 0.0;
+	mode = gmStandard;
+	letterboxInBreaks = false;
+	widescreenStoryboard = false;
+	bookmarks = {};
+	distanceSpacing = 0.0;
+	beatDivisor = 0;
+	gridSize = 0;
+	gridLevel = 0;
+	timelineZoom = 0.0;
+	title.clear();
+	titleUnicode.clear();
+	artist.clear();
+	artistUnicode.clear();
+	creator.clear();
+	version.clear();
+	source.clear();
+	tags = {};
+	beatmapID = 0;
+	beatmapSetID = 0;
+	hpDrainRate = 0.0;
+	HP = 0.0;
+	circleSize = 0.0; 
+	CS = 0.0;
+	circleRadiusPx = 0.0;
+	overallDifficulty = 0.0; 
+	OD = 0.0;
+	hitWindow300 = 0;
+	hitWindow100 = 0; 
+	hitWindow50 = 0;
+	requiredRPS = 0.0;
+	approachRate = 0.0; 
+	AR = 0.0;
+	preemptMs = 0;
+	fadeInMs = 0;
+	sliderMultiplier = 0.0;
+	sliderTickRate = 0.0;
+	events = {};
+	timingPoints = {};
+	msPerBeats = {};
+	lowestBPM = 0.0;
+	highestBPM = 0.0;
+	averageBPM = 0.0;
+	colors = {};
+	hitObjects = {};
+
+	_tpIndex = 0;
+	_b = {};
 }
 
 OsuParser::~OsuParser() {};
@@ -127,7 +183,7 @@ void OsuParser::Parse()
 	{
 		for (auto && f : t.second)
 		{
-			timingPoints.push_back(_ParseFieldAsTimingPoint(msPerBeats, f));
+			timingPoints.push_back(_ParseFieldAsTimingPoint(f));
 		}
 
 		lowestBPM = 1234567.0;
@@ -362,7 +418,7 @@ Event OsuParser::_ParseFieldAsEvent(const string & field)
 	return { eUnknown };
 }
 
-TimingPoint OsuParser::_ParseFieldAsTimingPoint(std::vector<double> & msPerBeats, const string & field)
+TimingPoint OsuParser::_ParseFieldAsTimingPoint(const string & field)
 {
 	string f = field;
 
@@ -406,7 +462,7 @@ TimingPoint OsuParser::_ParseFieldAsTimingPoint(std::vector<double> & msPerBeats
 
 RGBAColor OsuParser::_ParseFieldAsRGBAColor(const string & field)
 {
-	string f = field;
+	string f = field; //-V808
 
 	if (size_t len = f.find(':'); len != string::npos)
 	{
@@ -437,24 +493,15 @@ HitObject OsuParser::_ParseFieldAsHitObject(const string & field)
 {
 	string f = field;
 
-	for (size_t i = 0; i < f.size(); i++)
-	{
-		if (f[i] == ',')
-		{
-			f[i] = ' ';
-		}
-	}
-
-	string arg1, arg2, arg3, arg4, arg5;
-	stringstream ss(f);
-	ss >> arg1 >> arg2 >> arg3 >> arg4 >> arg5;
+	vector<string> args;
+	SplitString(f, ",", args);
 
 	HitObject o;
 	
-	o.x = (uint16_t)stoi(arg1);
-	o.y = (uint16_t)stoi(arg2);
-	o.time = stoll(arg3);
-	o.mask = (HitObjectMask)stoi(arg4);
+	o.x = (uint16_t)stoi(args[0]);
+	o.y = (uint16_t)stoi(args[1]);
+	o.time = stoll(args[2]);
+	o.mask = (HitObjectMask)stoi(args[3]);
 
 	if (IsBitSet(o.mask, 0))
 	{
@@ -483,7 +530,63 @@ HitObject OsuParser::_ParseFieldAsHitObject(const string & field)
 			((uint8_t)IsBitSet(o.mask, 6) << 2);
 	}
 
-	o.soundMask = (HitSoundMask)stoi(arg5);
+	o.soundMask = (HitSoundMask)stoi(args[4]);
+
+	// TODO: maybe safety checks for args size for different type of hit objects
+	if (o.type == oSpinner)
+	{
+		o.endTime = stoll(args[5]);
+	}
+
+	if (o.type == oSlider)
+	{
+		// TODO: Literally the last thing I need to parse
+	}
+
+	_ExtractExtras(args.back(), o);
 
 	return o;
+}
+
+void OsuParser::_ExtractExtras(const string & s, HitObject & o)
+{
+	vector<string> params;
+	SplitString(s, ":", params);
+
+	// Valid extras have at least 4 values
+	if (params.size() < 4) //-V112
+	{
+		return;
+	}
+
+	o.extra.sampleSet = (SampleSet)stoi(params[0]);
+	o.extra.additionSet = (SampleSet)stoi(params[1]);
+	o.extra.customIndex = (uint8_t)stoi(params[2]);
+	o.extra.volume = (uint8_t)stoi(params[3]);
+
+	if (params.size() == 5)
+	{
+		o.extra.volume = (uint8_t)stoi(params[4]);
+	}
+
+	o.adjustedExtra = o.extra;
+
+	while (_tpIndex + 1 < timingPoints.size() && o.time >= timingPoints[_tpIndex + 1].offset)
+	{
+		_tpIndex++;
+	}
+
+	const TimingPoint & tp = timingPoints[_tpIndex];
+
+	if (o.extra.sampleSet == ssAuto)
+	{
+		o.adjustedExtra.sampleSet = tp.sampleSet;
+	}
+
+	o.adjustedExtra.additionSet = tp.sampleSet;
+
+	if (o.extra.customIndex == 0)
+	{
+		o.adjustedExtra.customIndex = tp.sampleIndex;
+	}
 }

@@ -23,15 +23,12 @@ namespace osuParser
 		OsrParser(std::istream * stream);
 		~OsrParser();
 
-		// Goes through istream and assigns data
+		// Goes through istream and reads all data
 		void Parse();
 
 		// Game mode of the replay
 		GameMode mode;
-
-		// Game mode of the replay (in string form)
-		std::string modeString;
-
+		
 		// Version of the game where the replay was created
 		OsLong version;
 
@@ -76,10 +73,7 @@ namespace osuParser
 
 		// Mods used in a vector of ModType
 		std::vector<ModType> modsVector;
-
-		// Mods used in a vector of strings
-		std::vector<std::string> modsStringVector;
-
+		
 		// Life bar graph. Represents the amount of life you have at the given time
 		std::vector<LifeBarPoint> lifebar;
 
@@ -104,7 +98,6 @@ namespace osuParser
 		// Data extraction which requires more work than just
 		// reading byte values
 		void _CalcModsVector();
-		void _CalcModsStringVector();
 		void _CalcLifebar();
 		void _CalcActions();
 

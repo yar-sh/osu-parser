@@ -181,7 +181,7 @@ namespace osuParser
 		OsTime offset = 0;
 		double msPerBeat = 500.0;
 		double adjustedMsPerBeat = 500.0;
-		uint8_t beatsPerMeasure = 4;
+		uint8_t beatsPerMeasure = 4; //-V112
 		SampleSet sampleSet = ssNormal;
 		uint8_t sampleIndex = 0;
 		uint8_t volume = 100;
@@ -202,6 +202,23 @@ namespace osuParser
 		uint8_t a = 255;
 	};
 
+	// Additional parameters related to the hit sound samples
+	//   sampleSet, SampleSet, changes the sample set of the normal hit sound
+	//   additionSet, SampleSet, changes the sample set for the other hit 
+	//     sounds (whistle, finish, clap)
+	//   customIndex , uint8_t, custom sample set index
+	//   volume, uint8_t, volume of the sample
+	//   filename, string, names an audio file in the folder to play instead 
+	//     of sounds from sample sets
+	struct Extra
+	{
+		SampleSet sampleSet = ssAuto;
+		SampleSet additionSet = ssAuto;
+		uint8_t customIndex = 0;
+		uint8_t volume = 0;
+		std::string filename = "";
+	};
+
 	// A beatmap hit object in [HitObjects] section
 	// NOTE: 
 	/*
@@ -219,16 +236,24 @@ namespace osuParser
 	//   skipComboColors, uint8_t, number of combo colours to skip (from bits 4-6 in mask)
 	//     The combo skip value is ignored when the new combo bit is not set
 	//   soundMask, HitSoundMask, sounds to play when the hit object is successfully hit
+	//   extra, Extra, additional parameters related to the hit sound samples
+	//   adjustedExtra, Extra, if for any of sampleSet/additionSet/customIndex in extra
+	//     value is 0 (or ssAuto) then those values in adjustedExtra will be inherited 
+	//     from the last related timing point (as it says to do so in format docs)
+	//   endTime, OsTime, when the spinner will end (if type==oSpinner)
 	struct HitObject
 	{
+		OsTime time = 0; // At the top, because V802
+		OsTime endTime = 0;
 		uint16_t x = 0;
 		uint16_t y = 0;
-		OsTime time = 0;
 		HitObjectMask mask = 0;
 		HitObjectType type = oCircle;
 		bool isNewCombo = false;
 		uint8_t skipComboColors = 0;
 		HitSoundMask soundMask = hsNormal;
+		Extra extra;
+		Extra adjustedExtra;
 	};
 }
 
