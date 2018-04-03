@@ -11,10 +11,10 @@
 using namespace std;
 using namespace osuParser;
 
-// Creates a parser from ifstream
-OsrParser::OsrParser(istream * filestream)
+// Creates a parser from input data stream
+OsrParser::OsrParser(istream * stream)
 {
-	_s = filestream;
+	_s = stream;
 	mode = gmStandard;
 	version = 0;
 	player.clear();

@@ -20,7 +20,7 @@ namespace osuParser
 	{
 	public:
 		// Creates a parser from input data stream
-		OsrParser(std::istream * filestream);
+		OsrParser(std::istream * stream);
 		~OsrParser();
 
 		// Goes through istream and assigns data

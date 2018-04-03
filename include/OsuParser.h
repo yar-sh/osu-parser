@@ -111,20 +111,26 @@ namespace osuParser
 		// Size of hit object circles
 		double circleSize, CS;
 
-		// Readable size of CS in osu! pixels
-		double CSpx;
+		// Radius of a circle based on CS in osu! pixels
+		double circleRadiusPx;
 
 		// Amount of time allowed to click a hit object on time
 		double overallDifficulty, OD;
 
-		// Readable time of OD in ms
-		OsTime ODms;
+		// How much time is allowed to hit each score
+		OsTime hitWindow300, hitWindow100, hitWindow50;
+
+		// Harshness of spinners based on OD. Rotations per second required
+		double requiredRPS;
 
 		// Amount of time taken for the approach circle and hit object to appear
 		double approachRate, AR;
 
-		// Readable time of AR in ms
-		OsTime ARms;
+		// Amount of time since object's start to fade in to perfect hit
+		OsTime preemptMs;
+
+		// Amount of time it takes for object to completely fade in 
+		OsTime fadeInMs;
 
 		// Multiplier for the slider velocity
 		double sliderMultiplier;
@@ -152,7 +158,9 @@ namespace osuParser
 		double averageBPM;
 
 		// Vector of the colors of the combos
-		std::vector <RGBAColor> colors;
+		std::vector<RGBAColor> colors;
+
+		std::vector<HitObject> hitObjects;
 
 	private:
 		// Methods that extract and parse data from beatmap file
@@ -166,6 +174,7 @@ namespace osuParser
 		Event _ParseFieldAsEvent(const std::string & field);
 		TimingPoint _ParseFieldAsTimingPoint(std::vector<double> & msPerBeats, const std::string & field);
 		RGBAColor _ParseFieldAsRGBAColor(const std::string & field);
+		HitObject _ParseFieldAsHitObject(const std::string & field);
 
 		// Structure of all of the sections of the beatmap with all fields
 		OsBeatmap _b;

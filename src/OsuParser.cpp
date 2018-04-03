@@ -41,7 +41,7 @@ void OsuParser::Parse()
 		sampleSet = StringToEnum<SampleSet>(_ParseSectionField<string>(t, "SampleSet", "Unknown"), _sampleSetNames);
 		// TODO: Implement this https://osu.ppy.sh/help/wiki/Beatmap_Editor/Song_Setup 
 		stackLeniency = _ParseSectionField<double>(t, "StackLeniency", 0.7);
-		mode = StringToEnum<GameMode>(_ParseSectionField<string>(t, "Mode", "Unknown"), _modeNames);
+		mode = (GameMode)_ParseSectionField<int>(t, "Mode", 0);
 		letterboxInBreaks = _ParseSectionField<bool>(t, "LetterboxInBreaks", false);
 		widescreenStoryboard = _ParseSectionField<bool>(t, "WidescreenStoryboard", false);
 	}
@@ -74,7 +74,7 @@ void OsuParser::Parse()
 		beatmapSetID = _ParseSectionField<OsInteger>(t, "BeatmapSetID", 0);
 	}
 
-	//DIFFICULTY
+	// DIFFICULTY
 	t = _GetSection("Difficulty");
 	if (t != OsSection({}))
 	{
@@ -89,11 +89,23 @@ void OsuParser::Parse()
 		sliderMultiplier = _ParseSectionField<double>(t, "SliderMultiplier", 1.4);
 		sliderTickRate = _ParseSectionField<double>(t, "SliderTickRate", 1.0);
 
-		ARms = (AR < 5.0 || IsEqualDouble(AR, 5.0))
-			? (1800.0 - (120.0 * AR))
-			: (1950.0 - (150.0 * AR));
-		ODms = (79.5 - (6.0 * OD));
-		CSpx = 109.0 - 9.0 * CS;
+		preemptMs = (AR < 5.0 || IsEqualDouble(AR, 5.0))
+			? (1800.0 - 120.0 * AR)
+			: (1950.0 - 150.0 * AR);
+
+		fadeInMs = (AR < 5.0 || IsEqualDouble(AR, 5.0))
+			? (1200.0 - 80.0 * AR)
+			: (1300.0 - 100.0 * AR);
+
+		circleRadiusPx = 54.4 - 4.48 * CS;
+
+		hitWindow300 = 80.0 - 6.0 * OD;
+		hitWindow100 = 140.0 - 8.0 * OD; 
+		hitWindow50 = 200.0 - 10.0 * OD;
+
+		requiredRPS = (OD < 5.0 || IsEqualDouble(OD, 5.0))
+			? (3.0 - 2.0 / 5.0 * OD)
+			: (5.0 - 5.0 / 2.0 + OD / 2.0);
 	}
 
 	// EVENTS
@@ -156,6 +168,16 @@ void OsuParser::Parse()
 		}
 	}
 
+	// HIT OBJECTS
+	t = _GetSection("HitObjects");
+	if (t != OsSection({}))
+	{
+		for (auto && f : t.second)
+		{
+			hitObjects.push_back(_ParseFieldAsHitObject(f));
+		}
+	}
+
 	_b.clear();
 }
 
@@ -173,6 +195,53 @@ void OsuParser::_GetBeatmapVersion()
 	}
 
 	formatVersion = (uint8_t)-1;
+}
+
+void OsuParser::_ExtractStructure()
+{
+	string t;
+
+	while (!_s->eof() && !_s->fail())
+	{
+		getline(*_s, t);
+		TrimString(t);
+
+		if (t.empty())
+		{
+			continue;
+		}
+
+		size_t sz = t.size();
+
+		if (t[0] != '[' || t[sz - 1] != ']')
+		{
+			continue;
+		}
+
+		OsSection section;
+		section.first = t.substr(1, sz - 2);
+
+		while (true)
+		{
+			getline(*_s, t);
+			TrimString(t);
+
+			if (t.empty())
+			{
+				break;
+			}
+
+			// Skip commented lines
+			if (t[0] == '#' || t.find("//") == 0)
+			{
+				continue;
+			}
+
+			section.second.push_back(t);
+		}
+
+		_b.push_back(section);
+	}
 }
 
 OsSection OsuParser::_GetSection(const std::string & name)
@@ -204,7 +273,7 @@ T OsuParser::_ParseSectionField(const OsSection & section, const string & fieldN
 			f.erase(0, len + 1);
 
 			// OH BOY, LOOK, THIS RANDOM constexpr OVER HERE MAKES IT WORK
-			if constexpr (is_same_v<T, std::string>)
+			if constexpr (is_same_v<T, string>)
 			{
 				return f;
 			}
@@ -212,7 +281,6 @@ T OsuParser::_ParseSectionField(const OsSection & section, const string & fieldN
 			{
 				T t;
 				stringstream(f) >> t;
-
 				return t;
 			}
 		}
@@ -327,7 +395,7 @@ TimingPoint OsuParser::_ParseFieldAsTimingPoint(std::vector<double> & msPerBeats
 	}
 
 	tp.beatsPerMeasure = (uint8_t)stoi(arg3);
-	tp.sampleSet = StringToEnum<SampleSet>(arg4, _sampleSetNames);
+	tp.sampleSet = (SampleSet)stoi(arg4);
 	tp.sampleIndex = (uint8_t)stoi(arg5);
 	tp.volume = (uint8_t)stoi(arg6);
 	tp.isInheritable = (bool)stoi(arg7);
@@ -365,49 +433,57 @@ RGBAColor OsuParser::_ParseFieldAsRGBAColor(const string & field)
 	return {};
 }
 
-void OsuParser::_ExtractStructure()
+HitObject OsuParser::_ParseFieldAsHitObject(const string & field)
 {
-	string t;
+	string f = field;
 
-	while (!_s->eof() && !_s->fail())
+	for (size_t i = 0; i < f.size(); i++)
 	{
-		getline(*_s, t);
-		TrimString(t);
-
-		if (t.empty())
+		if (f[i] == ',')
 		{
-			continue;
+			f[i] = ' ';
 		}
-
-		size_t sz = t.size();
-
-		if (t[0] != '[' || t[sz - 1] != ']')
-		{
-			continue;
-		}
-		
-		OsSection section;
-		section.first = t.substr(1, sz - 2);
-
-		while (true)
-		{
-			getline(*_s, t);
-			TrimString(t);
-
-			if (t.empty())
-			{
-				break;
-			}
-
-			// Skip commented lines
-			if (t[0] == '#' || t.find("//") == 0)
-			{
-				continue;
-			}
-
-			section.second.push_back(t);
-		}
-
-		_b.push_back(section);
 	}
+
+	string arg1, arg2, arg3, arg4, arg5;
+	stringstream ss(f);
+	ss >> arg1 >> arg2 >> arg3 >> arg4 >> arg5;
+
+	HitObject o;
+	
+	o.x = (uint16_t)stoi(arg1);
+	o.y = (uint16_t)stoi(arg2);
+	o.time = stoll(arg3);
+	o.mask = (HitObjectMask)stoi(arg4);
+
+	if (IsBitSet(o.mask, 0))
+	{
+		o.type = oCircle;
+	}
+	else if (IsBitSet(o.mask, 1))
+	{
+		o.type = oSlider;
+	} 
+	else if (IsBitSet(o.mask, 3))
+	{
+		o.type = oSpinner;
+	} 
+	else if (IsBitSet(o.mask, 4))
+	{
+		o.type = oHoldNote;
+	}
+
+	o.isNewCombo = IsBitSet(o.mask, 2);
+
+	if (o.isNewCombo)
+	{
+		o.skipComboColors =
+			((uint8_t)IsBitSet(o.mask, 4) << 0) |
+			((uint8_t)IsBitSet(o.mask, 5) << 1) |
+			((uint8_t)IsBitSet(o.mask, 6) << 2);
+	}
+
+	o.soundMask = (HitSoundMask)stoi(arg5);
+
+	return o;
 }

@@ -29,6 +29,7 @@ namespace osuParser
 	// Some typedefs for osu beatmap structure
 	typedef std::pair<std::string, std::vector<std::string>> OsSection;
 	typedef std::vector<OsSection> OsBeatmap;
+	typedef OsByte HitObjectMask;
 	typedef OsByte HitSoundMask;
 
 	// Valid keys values. Used in InputMask (OsByte). Enum values represent the bits' number 
@@ -105,14 +106,15 @@ namespace osuParser
 		eUnknown = 3,
 	};
 
-	// Valid hit object values for beatmap [HitObjects] section
+	// Valid hit object values for beatmap [HitObjects] section. Used in HitObjectMask.
+	// Enum values represent the bits' number that are active in HitObjectMask
 	// THERE ARE SPECIFIC REASONS WHY I USE 'o' AS A PREFIX, PLEASE UNDERSTAND
 	enum HitObjectType
 	{
 		oCircle = 0,
 		oSlider = 1,
-		oSpinner = 2,
-		oHoldNote = 3,
+		oSpinner = 3,
+		oHoldNote = 7,
 	};
 
 	// Valid hit sounds values. Used in HitSoundMask (OsByte). Enum values represent the bits' number 
@@ -207,22 +209,26 @@ namespace osuParser
 	64 pixels to x and 48 pixels to y to respect a uniform padding. Without 
 	the padding, an object at (0, 0) will be cut on the top left for the screen.
 	*/
-	//   x, double, x position of the center of the hit object in osu!pixels
-	//   y, double, y position of the center of the hit object in osu!pixels
+	//   x, uint16_t, x position of the center of the hit object in osu!pixels
+	//   y, uint16_t, y position of the center of the hit object in osu!pixels
 	//   time, OsTime, number of milliseconds from the beginning of the song, and 
 	//     specifies when the hit begins
-	//   type, HitObjectType, type of the hit object
-	//   hitSound, HitSoundMask, sounds to play when the hit object is successfully hit
-	//   isNewCombo, bool, whether or not this hit object starts a new combo
-	//   TODO (not a priority): count bits 4-6 of type to skip N number of combo colors
+	//   mask, HitObjectMask, bitmap specifying the object type and attributes
+	//   type, HitObjectType, type of the hit object (from bits 0/1/3/7 in mask)
+	//   isNewCombo, bool, whether or not this hit object starts a new combo (from bit 2 in mask)
+	//   skipComboColors, uint8_t, number of combo colours to skip (from bits 4-6 in mask)
+	//     The combo skip value is ignored when the new combo bit is not set
+	//   soundMask, HitSoundMask, sounds to play when the hit object is successfully hit
 	struct HitObject
 	{
-		double x = 0.0;
-		double y = 0.0;
+		uint16_t x = 0;
+		uint16_t y = 0;
 		OsTime time = 0;
+		HitObjectMask mask = 0;
 		HitObjectType type = oCircle;
-		HitSoundMask hitSound = hsNormal;
 		bool isNewCombo = false;
+		uint8_t skipComboColors = 0;
+		HitSoundMask soundMask = hsNormal;
 	};
 }
 

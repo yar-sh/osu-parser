@@ -1,7 +1,8 @@
 # osu!parser
 Parse any osu! related file *(in theory. Right now only \*.osr (osu!replay) files are supported)*
-**ah yes the partial support of beatmaps is here, enjoy**
+**ah yes the partial support of beatmaps is here too now, enjoy**
 **NOTE: docs in README are not up to date. Refer to comments in code for now**
+**доки ближе к выходным будут**
  
  
 ## Features
@@ -27,7 +28,7 @@ Parse any osu! related file *(in theory. Right now only \*.osr (osu!replay) file
   
 ## Status
 - osr: Tested with valid osu!standard replays
-- WARNING: In all other cases behaviour might be unpredictable
+- WARNING: In all other cases behavior might be unpredictable
  
  
 ## Requirements
@@ -103,8 +104,8 @@ int main()
 * const *_modNames*, **vector\<string>**, string names for each of the available mods
 * const *_modeNames*, **vector\<string>**, string names for each of the game modes
 #### **OsrParser**
-* constructor **OsrParser(filestream)**: Constructs an object for parsing "*.osr" files from preloaded stream
-    - *filestream*, **\*istream**, input data stream
+* constructor **OsrParser(stream)**: Constructs an object for parsing "*.osr" files from input stream
+    - *stream*, **\*istream**, input data stream
 * void **Parse()**: Goes through input data stream and collects/processes data
 <br>After calling **.Parse()** the following data members will be filled and available:
     - *mode*, **GameMode**, game mode of the replay
@@ -129,7 +130,8 @@ int main()
     - *timestamp*, **OsShort**, [time stamp](https://msdn.microsoft.com/en-us/library/system.datetime.ticks(v=vs.110).aspx)
     - *actions*, **vector\<Action>**, vector of actions. See Action struct
     - *unknown*, **OsLong**, last 4 bytes of replay file - unknown
- 
+#### **OsuParser**
+*WIP*
  
 ## TODO
 - Parse .osu beatmaps (WIP)
