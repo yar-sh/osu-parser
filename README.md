@@ -1,8 +1,8 @@
-# osu!parser
-Parse any osu! related file *(in theory. Right now only \*.osr (osu!replay) files are supported)*
-**ah yes the partial support of beatmaps is here too now, enjoy**
-**NOTE: docs in README are not up to date. Refer to comments in code for now**
-**доки ближе к выходным будут**
+# оsu!рarsеr
+Parse any osu! related file *(in theory. Right now only \*.osr (osu!replay) files are supported)*  
+**ah yes the partial support of beatmaps is here too now, enjoy**  
+**NOTE: docs in README are not up to date. Refer to comments in code for now**  
+**доки ближе к выходным будут**  
  
  
 ## Features
@@ -132,7 +132,7 @@ int main()
     - *unknown*, **OsLong**, last 4 bytes of replay file - unknown
 #### **OsuParser**
 *WIP*
- 
+
 ## TODO
 - Parse .osu beatmaps (WIP)
 - Parse .db files
