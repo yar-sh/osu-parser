@@ -27,12 +27,12 @@ namespace osuParser
 	typedef OsByte InputMask;
 
 	// Some typedefs for osu beatmap structure
-	typedef std::pair<std::string, std::vector<std::string>> OsSection;
-	typedef std::vector<OsSection> OsBeatmap;
+	typedef std::pair<std::string, std::vector<std::string>> _OsSection;
+	typedef std::vector<_OsSection> _OsBeatmap;
 	typedef OsByte HitObjectMask;
 	typedef OsByte HitSoundMask;
 
-	// Valid keys values. Used in InputMask (OsByte). Enum values represent the bits' number 
+	// Valid key values. Used in InputMask (OsByte). Enum values represent the bits' number 
 	// that are active in InputMask
 	enum InputType
 	{
@@ -87,7 +87,7 @@ namespace osuParser
 		gmMania = 3,
 	};
 
-	// Valid sample sets values
+	// Valid sample set values
 	enum SampleSet
 	{
 		ssAuto = 0,
@@ -183,7 +183,7 @@ namespace osuParser
 	//   beatsPerMeasure, uint8_t, number of beats in a measure
 	//   sampleSet, SampleSet, default sample set for hit objects
 	//   sampleIndex, uint8_t, default custom index
-	//   isInheritable, bool, tells if the timing point can be inherited from
+	//   isInheritable, bool, if the timing point can be inherited from
 	//   is KiaiMode, bool, whether or not Kiai Time effects are active
 	struct TimingPoint
 	{
