@@ -54,23 +54,23 @@ namespace osuParser
 	// Returns true if both values are equal, false otherwise
 	bool IsEqualDouble(const double & a, const double & b);
 	
-	// String names for each of the available mods
+	// String names for each available mod
 	const extern std::vector<std::string> _modNames;
 
-	// String names for each of the available game modes
+	// String names for each available game mode
 	const extern std::vector<std::string> _modeNames;
 
-	// String names for each of the available sample sets
+	// String names for each available sample set
 	const extern std::vector<std::string> _sampleSetNames;
 
-	// String names for each of the available beatmap events
+	// String names for each available beatmap event
 	const extern std::vector<std::string> _eventNames;
-
-	// String names for each of the available hit object types
-	const extern std::vector<std::string> _hitObjectNames;
-
-	// String names for each of the available hit sound types
+	
+	// String names for each available hit sound type
 	const extern std::vector<std::string> _hitSoundNames;
+
+	// String names for each available slider type
+	const extern std::vector<std::string> _sliderNames;
 
 	// Converts any enumerated type value to the string from 
 	// associated vector of string values

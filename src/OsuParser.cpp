@@ -8,8 +8,6 @@
 
 #include "OsuParser.h"
 
-// TODO: when parsing args in stringstream maybe use SplitString instead
-
 using namespace std;
 using namespace osuParser;
 
@@ -219,7 +217,6 @@ void OsuParser::Parse()
 			// Hmmm... so apparently there are "Special coloUrs" for slider
 			// TODO (not a priority) them some time 
 
-
 			colors.push_back(_ParseFieldAsRGBAColor(f));
 		}
 	}
@@ -389,30 +386,21 @@ Event OsuParser::_ParseFieldAsEvent(const string & field)
 {
 	string f = field;
 
-	for (size_t i = 0; i < f.size(); i++)
-	{
-		if (f[i] == ',')
-		{
-			f[i] = ' ';
-		}
-	}
+	vector<string> args;
+	SplitString(f, ",", args);
 
-	string arg1, arg2, arg3;
-	stringstream ss(f);
-	ss >> arg1 >> arg2 >> arg3;
-
-	if (arg1 == "0")
+	if (args[0] == "0")
 	{
-		return { eBackground, arg3 };
+		return { eBackground, args[2] };
 	}
-	else if (arg1 == "2")
+	else if (args[0] == "2")
 	{
-		return { eBreak, "", stoll(arg2), stoll(arg3) };
+		return { eBreak, "", stoll(args[1]), stoll(args[2]) };
 	}
-	else if (arg1 == "Video")
+	else if (args[0] == "Video")
 	{
 		size_t sz = f.find('"') + 1;
-		return { eVideo, string(f, sz, f.find_last_of('"') - sz), stoll(arg2) };
+		return { eVideo, string(f, sz, f.find_last_of('"') - sz), stoll(args[1]) };
 	}
 
 	return { eUnknown };
@@ -422,22 +410,13 @@ TimingPoint OsuParser::_ParseFieldAsTimingPoint(const string & field)
 {
 	string f = field;
 
-	for (size_t i = 0; i < f.size(); i++)
-	{
-		if (f[i] == ',')
-		{
-			f[i] = ' ';
-		}
-	}
-
-	string arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8;
-	stringstream ss(f);
-	ss >> arg1 >> arg2 >> arg3 >> arg4 >> arg5 >> arg6 >> arg7 >> arg8;
+	vector<string> args;
+	SplitString(f, ",", args);
 
 	TimingPoint tp;
 
-	tp.offset = stoll(arg1);
-	tp.msPerBeat = stod(arg2);
+	tp.offset = stoll(args[0]);
+	tp.msPerBeat = stod(args[1]);
 
 	if (tp.msPerBeat > 0)
 	{
@@ -450,12 +429,12 @@ TimingPoint OsuParser::_ParseFieldAsTimingPoint(const string & field)
 		tp.adjustedMsPerBeat = (tp.msPerBeat / -100.0) * msPerBeats.back();
 	}
 
-	tp.beatsPerMeasure = (uint8_t)stoi(arg3);
-	tp.sampleSet = (SampleSet)stoi(arg4);
-	tp.sampleIndex = (uint8_t)stoi(arg5);
-	tp.volume = (uint8_t)stoi(arg6);
-	tp.isInheritable = (bool)stoi(arg7);
-	tp.isKiaiMode = (bool)stoi(arg8);
+	tp.beatsPerMeasure = (uint8_t)stoi(args[2]);
+	tp.sampleSet = (SampleSet)stoi(args[3]);
+	tp.sampleIndex = (uint8_t)stoi(args[4]);
+	tp.volume = (uint8_t)stoi(args[5]);
+	tp.isInheritable = (bool)stoi(args[6]);
+	tp.isKiaiMode = (bool)stoi(args[7]);
 
 	return tp;
 }
@@ -467,22 +446,14 @@ RGBAColor OsuParser::_ParseFieldAsRGBAColor(const string & field)
 	if (size_t len = f.find(':'); len != string::npos)
 	{
 		f.erase(0, len + 1);
-		for (size_t i = 0; i < f.size(); i++)
-		{
-			if (f[i] == ',')
-			{
-				f[i] = ' ';
-			}
-		}
 
-		string arg1, arg2, arg3;
-		stringstream ss(f);
-		ss >> arg1 >> arg2 >> arg3;
+		vector<string> args;
+		SplitString(f, ",", args);
 
 		return {
-			(uint8_t)stoi(arg1),
-			(uint8_t)stoi(arg2),
-			(uint8_t)stoi(arg3),
+			(uint8_t)stoi(args[0]),
+			(uint8_t)stoi(args[1]),
+			(uint8_t)stoi(args[2]),
 		};
 	}
 
@@ -507,15 +478,18 @@ HitObject OsuParser::_ParseFieldAsHitObject(const string & field)
 	{
 		o.type = oCircle;
 	}
-	else if (IsBitSet(o.mask, 1))
+	
+	if (IsBitSet(o.mask, 1))
 	{
 		o.type = oSlider;
 	} 
-	else if (IsBitSet(o.mask, 3))
+	
+	if (IsBitSet(o.mask, 3))
 	{
 		o.type = oSpinner;
 	} 
-	else if (IsBitSet(o.mask, 4))
+	
+	if (IsBitSet(o.mask, 7))
 	{
 		o.type = oHoldNote;
 	}
@@ -532,18 +506,68 @@ HitObject OsuParser::_ParseFieldAsHitObject(const string & field)
 
 	o.soundMask = (HitSoundMask)stoi(args[4]);
 
+	_ExtractExtras(args.back(), o);
+
 	// TODO: maybe safety checks for args size for different type of hit objects
 	if (o.type == oSpinner)
 	{
-		o.endTime = stoll(args[5]);
+		o.spinner.isSpinner = true;
+		o.spinner.end = stoll(args[5]);
 	}
 
 	if (o.type == oSlider)
 	{
-		// TODO: Literally the last thing I need to parse
-	}
+		o.slider.isSlider = true;
+		o.slider.curvePoints.push_back({ o.x, o.y });
 
-	_ExtractExtras(args.back(), o);
+		switch (args[5][0])
+		{
+		case 'B': o.slider.type = sBezier; break;
+		case 'C': o.slider.type = sCatmull; break;
+		case 'P': o.slider.type = sPerfect; break;
+		default: o.slider.type = sLinear; break;
+		}
+
+		args[5].erase(0, 2);
+
+		vector<string> params;
+		SplitString(args[5], "|", params);
+
+		for (auto && p : params)
+		{
+			vector<string> values;
+			SplitString(p, ":", values);
+
+			o.slider.curvePoints.push_back({
+				(uint16_t)stoi(values[0]),
+				(uint16_t)stoi(values[1]),
+			});
+		}
+
+		o.slider.nRepeats = (uint8_t)stoi(args[6]);
+		o.slider.length = stod(args[7]);
+		o.slider.duration = (o.slider.length * o.slider.nRepeats) / (100.0 * sliderMultiplier) * timingPoints[_tpIndex].adjustedMsPerBeat;
+
+		SplitString(args[8], "|", params);
+
+		for (size_t i = 0; i < params.size(); i++)
+		{
+			o.slider.edgeHitSounds.push_back((HitSoundMask)stoi(params[i]));
+		}
+
+		SplitString(args[9], "|", params);
+
+		for (size_t i = 0; i < params.size(); i++)
+		{
+			vector<string> values;
+			SplitString(params[i], ":", values);
+
+			o.slider.curvePoints.push_back({
+				(uint16_t)stoi(values[0]),
+				(uint16_t)stoi(values[1]),
+				});
+		}
+	}
 
 	return o;
 }
@@ -571,6 +595,7 @@ void OsuParser::_ExtractExtras(const string & s, HitObject & o)
 
 	o.adjustedExtra = o.extra;
 
+	// Keep track of the internal timing point counter
 	while (_tpIndex + 1 < timingPoints.size() && o.time >= timingPoints[_tpIndex + 1].offset)
 	{
 		_tpIndex++;

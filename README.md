@@ -1,8 +1,5 @@
 # оsu!рarsеr
-Parse any osu! related file *(in theory. Right now only \*.osr (osu!replay) files are supported)*  
-**ah yes the partial support of beatmaps is here too now, enjoy**  
-**NOTE: docs in README are not up to date. Refer to comments in code for now**  
-**доки ближе к выходным будут**  
+Parse any osu! related file *(in theory. Right now only \*.osr (replays) and \*.osu (beatmaps) files are supported)*  
  
  
 ## Features
@@ -18,6 +15,7 @@ Parse any osu! related file *(in theory. Right now only \*.osr (osu!replay) file
 - [Installation](#installation)
 - [Code sample](#code-sample)
     - [Parse `*.osr`](#osr)
+    - [Parse `*.osu`](#osu)
 - [API](#api)
     - [Types](#types)
     - [Utils](#utils)
@@ -28,6 +26,7 @@ Parse any osu! related file *(in theory. Right now only \*.osr (osu!replay) file
   
 ## Status
 - osr: Tested with valid osu!standard replays
+- osu: Tested (but not thoroughly) with valid osu!standard beatmaps
 - WARNING: In all other cases behavior might be unpredictable
  
  
@@ -56,29 +55,75 @@ int main()
 }
 ```
 (Refer to [osr file format documentation](https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osr_(file_format)) for details)
+#### **osu**
+```cpp
+#include "osu!parser.h"
+#include <fstream>
+
+int main()
+{
+    std::ifstream file("beatmap.osu");
+    osuParser::OsuParser p(file);
+    p.Parse();
+    // p.<parsedValues>
+}
+```
+(Refer to [osu file format documentation](https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osu_(file_format)) for details)
  
  
 ## API
 #### **Types**
-* **OsTime**, typedef, representation of time in milliseconds
-* **OsByte**, typedef, osr byte (1 byte)
-* **OsShort**, typedef, osr short (2 bytes)
-* **OsInteger**, typedef, osr integer (4 bytes)
-* **OsLong**, typedef, osr long (8 bytes)
-* **InputMask**, typedef, representation of active inputs as a bit mask
-* **InputType**, enum, valid input values, numeric values represent an active bit position in **InputMask**
-* **ModMask**, typedef, representation of active mods as a bit mask
-* **ModType**, enum, valid mod values, numeric values represent an active bit position in **ModMask**
+* **OsTime**, typedef *int64_t*, representation of time in milliseconds
+* **OsByte**, typedef *uint8_t*, osr byte (1 byte)
+* **OsShort**, typedef *uint16_t*, osr short (2 bytes)
+* **OsInteger**, typedef *uint32_t*, osr integer (4 bytes)
+* **OsLong**, typedef *uint64_t*, osr long (8 bytes)
+* **ModMask**, typedef *OsInteger*, representation of active mods as a bit mask
+* **InputMask**, typedef *OsByte*, representation of active inputs as a bit mask
+* **HitObjectMask**, typedef *OsByte*, representation of hit object data as a bit mask
+* **HitSoundMask**, typedef *OsByte*, representation of active sounds as a bit mask
+* **InputType**, enum, valid key values. Enum values represent the bits' number that are active in **InputMask**
+* **ModType**, enum, valid mods values. Enum values represent the bits' number that are active in **ModMask**
 * **GameMode**, enum, valid game mode values
-* **LifeBarPoint**, struct, represents a point on the liferbar graph:
+* **SampleSet**, enum, valid sample set values
+* **EventType**, enum, valid events for beatmap [Events] section
+* **HitObjectType**, enum, valid hit object values for beatmap [HitObjects] section. Enum values represent the bits' number that are active in **HitObjectMask**
+* **HitSoundType**, enum, valid hit sounds values. Enum values represent the bits' number that are active in **HitSoundMask**
+* **SliderType**, enum, valid slider types for slider hit objects
+* **LifeBarPoint**, struct, point on the lifebar graph:
     - *time*, **OsTime**, time of the point on lifebar graph
     - *life*, **double**, value of the lifebar from 0.0 (empty) to 1.0 (full)
-* **Action**, struct, represents a replay action:
-    - *msSinceLast*, **OsTime**, time since last action
-    - *msSinceStart*, **OsTime**, time since the start of the song
-    - *x*, **double**, x position of the cursor (in osu!pixels)
-    - *y*, **double**, y position of the cursor (in osu!pixels)
+* **Action**, struct, replay action:
+    - *sinceLast*, **OsTime**, action time since last action
+    - *sinceStart*, **OsTime**, action time since the start of the song
+    - *x*, **double**, x position of the cursor in osu!pixels
+    - *y*, **double**, y position of the cursor in osu!pixels
     - *inputs*, **InputMask**, active inputs in this action
+* **Event**, struct, beatmap event in [Events] section:
+    - *type*, **EventType**, type of the event
+    - *file*, **string**, name of the file that is specified for event
+    - *begin*, **OsTime**, when event should begin
+    - *end*, **OsTime**, when event should end
+* **TimingPoint**, struct, beatmap timing point in [TimingPoints] section:
+    - *offset*, **OsTime**, when the timing point starts
+    - *msPerBeat*, **double**, defines the duration of one beat. When positive, it is faithful to its name. When negative, it is a percentage of previous non-negative milliseconds per beat, which is stored in adjustedMsPerBeat
+    - *adjustedMsPerBeat*, **double**, adjusted duration of each bit based on the sign of msPerBeat
+    - *beatsPerMeasure*, **uint8_t**, number of beats in a measure
+    - *sampleSet*, **SampleSet**, default sample set for hit objects
+    - *sampleIndex*, **uint8_t**, default custom index
+    - *isInheritable*, **bool**, if the timing point can be inherited from
+    - *KiaiMode*, **bool**, whether or not Kiai Time effects are active
+* **RGBAColor**, struct, beatmap combo color in [Colours] section:
+    - *r*, **uint8_t**, value of red channel
+    - *g*, **uint8_t**, value of green channel
+    - *b*, **uint8_t**, value of blue channel
+    - *a*, **uint8_t**, value of alpha channel
+* **Extra**, struct, additional parameters related to the hit sound samples:
+    - *sampleSet*, **SampleSet**, changes the sample set of the normal hit sound
+    - *additionSet*, **SampleSet**, changes the sample set for the other hit sounds (whistle, finish, clap)
+    - *customIndex*, **uint8_t**, custom sample set index
+    - *volume*, **uint8_t**, volume of the sample
+    - *filename*, **string**,  names an audio file in the folder to play instead of sounds from sample sets
 #### **Utils**
 * void **SplitString(str, delimiter, output)**: Splits a string into multiple parts with given delimiter
     - *str*, **string**, string to split
@@ -134,6 +179,5 @@ int main()
 *WIP*
 
 ## TODO
-- Parse .osu beatmaps (WIP)
 - Parse .db files
-- Test other game modes
+- Test other game modes for \*.osr and \*.osu

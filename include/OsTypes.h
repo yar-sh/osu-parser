@@ -127,6 +127,15 @@ namespace osuParser
 		hsClap = 3,
 	};
 
+	// Valid slider types for slider hit objects
+	enum SliderType
+	{
+		sLinear = 0,
+		sPerfect = 1,
+		sBezier = 2,
+		sCatmull = 3,
+	};
+
 	// A point on the lifebar graph
 	//   time, OsTime, time of the point on lifebar graph
 	//   life, double, value of the lifebar from 0.0 (empty) to 1.0 (full)
@@ -137,15 +146,15 @@ namespace osuParser
 	};
 
 	// A replay action
-	//   msSinceLast, OsTime, action time since last action
-	//   msSinceStart, OsTime, action time since the start of the song
-	//   x, double, x position of the cursor (in osu!pixels)
-	//   y, double, y position of the cursor (in osu!pixels)
+	//   sinceLast, OsTime, action time since last action
+	//   sinceStart, OsTime, action time since the start of the song
+	//   x, double, x position of the cursor in osu!pixels
+	//   y, double, y position of the cursor in osu!pixels
 	//   inputs, InputMask, active inputs in this action
 	struct Action
 	{
-		OsTime msSinceLast = 0;
-		OsTime msSinceStart = 0;
+		OsTime sinceLast = 0;
+		OsTime sinceStart = 0;
 		double x = 0.0;
 		double y = 0.0;
 		InputMask inputs = 0;
@@ -154,14 +163,14 @@ namespace osuParser
 	// A beatmap event in [Events] section
 	//   type, EventType, type of the event
 	//   file, string, name of the file that is specified for event
-	//   beginMs, OsTime, when event should begin
-	//   endMs, OsTime, when event should end
+	//   begin, OsTime, when event should begin
+	//   end, OsTime, when event should end
 	struct Event
 	{
 		EventType type = eBackground;
 		std::string file = "";
-		OsTime beginMs = 0;
-		OsTime endMs = 0;
+		OsTime begin = 0;
+		OsTime end = 0;
 	};
 
 	// A beatmap timing point in [TimingPoints] section
@@ -219,13 +228,60 @@ namespace osuParser
 		std::string filename = "";
 	};
 
+	// Represents a curve point data for sliders
+	//   x, uint16_t, x coordinate describing position of the control point
+	//   y, uint16_t, y coordinate describing position of the control point
+	struct CurvePoint
+	{
+		uint16_t x = 0;
+		uint16_t y = 0;
+	};
+
+	// Sample sets to apply to the circles of the slider
+	//   sampleSet, SampleSet, changes the sample set of the normal hit sound
+	//   additionSet, SampleSet, changes the sample set for the other hit 
+	//     sounds (whistle, finish, clap)
+	struct EdgeAddition
+	{
+		SampleSet sampleSet;
+		SampleSet additionSet;
+	};
+
+	// Information about spinner hit object
+	//   isSpinner, bool, if the hit object is actually a spinner
+	//   end, OsTime, when the spinner will end
+	struct SpinnerData
+	{
+		bool isSpinner = false;
+		OsTime end = 0;
+	};
+
+	// Information about slider hit object
+	//   isSlider, bool, if the hit object is actually a slider
+	//   sliderType, SliderType, type of the slider
+	//   curvePoints, vector of CurvePoint, points of the slider (including initial x and y)
+	//   nRepeats, uint8_t, number of slider repeats
+	//   length, double, total length of the slider in osu!pixels
+	//   duration, OsTime, duration of the slider in milliseconds
+	//   edgeHitSounds, vector of HitSoundMask, hit sounds to apply to the circles of the slider
+	//   edgeAdditions, vector of EdgeAddition, samples sets to apply to the circles of the slider
+	//   adjustedEdgeAdditions, vector of EdgeAddition, if for sampleSet or additionSet in edgeAdditions
+	//     value is 0 (or ssAuto) then those values in adjustedEdgeAdditions will be inherited 
+	//     from the last related timing point (as it says to do so in format docs)
+	struct SliderData
+	{
+		bool isSlider = false;
+		SliderType type = sLinear;
+		std::vector<CurvePoint> curvePoints;
+		uint8_t nRepeats = 0;
+		double length = 0;
+		OsTime duration = 0;
+		std::vector<HitSoundMask> edgeHitSounds = {};
+		std::vector<EdgeAddition> edgeAdditions = {};
+		std::vector<EdgeAddition> adjustedEdgeAdditions = {};
+	};
+	
 	// A beatmap hit object in [HitObjects] section
-	// NOTE: 
-	/*
-	To map these coordinates for a standard 640x480 screen, you need to add 
-	64 pixels to x and 48 pixels to y to respect a uniform padding. Without 
-	the padding, an object at (0, 0) will be cut on the top left for the screen.
-	*/
 	//   x, uint16_t, x position of the center of the hit object in osu!pixels
 	//   y, uint16_t, y position of the center of the hit object in osu!pixels
 	//   time, OsTime, number of milliseconds from the beginning of the song, and 
@@ -240,11 +296,11 @@ namespace osuParser
 	//   adjustedExtra, Extra, if for any of sampleSet/additionSet/customIndex in extra
 	//     value is 0 (or ssAuto) then those values in adjustedExtra will be inherited 
 	//     from the last related timing point (as it says to do so in format docs)
-	//   endTime, OsTime, when the spinner will end (if type==oSpinner)
+	//   spinner, SpinnerData, spinner information (if type==oSpinner)
+	//   slider, SliderData, slider information (if type==oSlider)
 	struct HitObject
 	{
 		OsTime time = 0; // At the top, because V802
-		OsTime endTime = 0;
 		uint16_t x = 0;
 		uint16_t y = 0;
 		HitObjectMask mask = 0;
@@ -252,8 +308,10 @@ namespace osuParser
 		bool isNewCombo = false;
 		uint8_t skipComboColors = 0;
 		HitSoundMask soundMask = hsNormal;
-		Extra extra;
-		Extra adjustedExtra;
+		Extra extra = {};
+		Extra adjustedExtra = {};
+		SpinnerData spinner = {};
+		SliderData slider = {};
 	};
 }
 

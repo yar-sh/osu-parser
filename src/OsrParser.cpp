@@ -193,7 +193,7 @@ void OsrParser::_CalcLifebar()
 
 void OsrParser::_CalcActions()
 {
-	OsTime msSinceStart = 0;
+	OsTime sinceStart = 0;
 	uint32_t actionsLength = _GetStreamInteger();
 	vector<uint8_t> compressedBytes(actionsLength);
 	vector<uint8_t> decompressedBytes;
@@ -211,14 +211,14 @@ void OsrParser::_CalcActions()
 
 		if (actions.size() > 0)
 		{
-			msSinceStart += actions.back().msSinceLast;
+			sinceStart += actions.back().sinceLast;
 		}
 
 		if (values.size() == ACTION_LENGTH)
 		{
 			actions.push_back({
 				atoll(values[0].c_str()),
-				msSinceStart,
+				sinceStart,
 				stod(values[1].c_str(), nullptr),
 				stod(values[2].c_str(), nullptr),
 				(uint8_t)strtoul(values[3].c_str(), nullptr, 10),

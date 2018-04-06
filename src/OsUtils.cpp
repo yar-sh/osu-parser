@@ -18,6 +18,8 @@ using namespace std;
 // Eg: SplitString("1|2|3,4|5|6", ',', output) -> ["1|2|3","4|5|6"]
 void osuParser::SplitString(const string & str, const string & delim, vector<string> & output)
 {
+	output.clear();
+
 	size_t prev = 0;
 	size_t pos = 0;
 
@@ -90,7 +92,7 @@ bool osuParser::IsEqualDouble(const double & a, const double & b)
 	return fabs(a - b) < DBL_EPSILON;
 }
 
-// String names for each of the available mods
+// String names for each available mod
 const vector<string> osuParser::_modNames = {
 	"NoFail", "Easy", "NoVideo", "Hidden", "HardRock", "SuddenDeath", "DoubleTime",
 	"Relax", "HalfTime", "Nightcore", "Flashlight", "Autoplay", "SpunOut", "Relax2",
@@ -98,27 +100,27 @@ const vector<string> osuParser::_modNames = {
 	"TargetPractice", "Key9", "Coop", "Key1", "Key3", "Key2",
 };
 
-// String names for each of the available game modes
+// String names for each available game mode
 const vector<string> osuParser::_modeNames = {
 	"Standard", "Taiko", "Catch The Beat", "Mania"
 };
 
-// String names for each of the available sample sets
+// String names for each available sample set
 const vector<string> osuParser::_sampleSetNames = {
 	"Auto", "Normal", "Soft", "Drum"
 };
 
-// String names for each of the available beatmap events
+// String names for each available beatmap event
 const vector<string> osuParser::_eventNames = {
 	"Background", "Video", "Break", "Unknown"
 };
 
-// String names for each of the available hit object types
-const vector<string> osuParser::_hitObjectNames = {
-	"Circle", "Slider", "Spinner", "HoldNote"
-};
-
-// String names for each of the available hit sound types
+// String names for each available hit sound type
 const vector<string> osuParser::_hitSoundNames = {
 	"Normal", "Whistle", "Finish", "Clap"
+};
+
+// String names for each available slider type
+const vector<string> osuParser::_sliderNames = {
+	"Linear", "Perfect", "Bezier", "Catmull"
 };
