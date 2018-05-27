@@ -84,9 +84,11 @@ void OsuParser::Parse()
 
 	_s->seekg(0);
 
+	_OsSection defaultSection = _OsSection({});
+
 	// GENERAL
-	OsSection t = _GetSection("General");
-	if (t != OsSection({}))
+	_OsSection t = _GetSection("General");
+	if (t != defaultSection)
 	{
 		audioFilename = _ParseSectionField<string>(t, "AudioFilename", "Unknown");
 		audioLeadIn = _ParseSectionField<OsTime>(t, "AudioLeadIn", 0);
@@ -102,7 +104,7 @@ void OsuParser::Parse()
 
 	// EDITOR
 	t = _GetSection("Editor");
-	if (t != OsSection({}))
+	if (t != defaultSection)
 	{
 		bookmarks = _ParseSectionFieldAsList<OsTime>(t, "Bookmarks", ",");
 		distanceSpacing = _ParseSectionField<double>(t, "DistanceSpacing", 1.22);
@@ -114,7 +116,7 @@ void OsuParser::Parse()
 
 	// METADATA
 	t = _GetSection("Metadata");
-	if (t != OsSection({}))
+	if (t != defaultSection)
 	{
 		title = _ParseSectionField<string>(t, "Title", "Unknown");
 		titleUnicode = _ParseSectionField<string>(t, "TitleUnicode", title);
@@ -130,7 +132,7 @@ void OsuParser::Parse()
 
 	// DIFFICULTY
 	t = _GetSection("Difficulty");
-	if (t != OsSection({}))
+	if (t != defaultSection)
 	{
 		hpDrainRate = _ParseSectionField<double>(t, "HPDrainRate", 5.0);
 		HP = hpDrainRate;
@@ -164,7 +166,7 @@ void OsuParser::Parse()
 
 	// EVENTS
 	t = _GetSection("Events");
-	if (t != OsSection({}))
+	if (t != defaultSection)
 	{
 		for (auto && f : t.second)
 		{
@@ -177,7 +179,7 @@ void OsuParser::Parse()
 
 	// TIMING POINTS
 	t = _GetSection("TimingPoints");
-	if (t != OsSection({}))
+	if (t != defaultSection)
 	{
 		for (auto && f : t.second)
 		{
@@ -210,7 +212,7 @@ void OsuParser::Parse()
 	
 	// COLORS
 	t = _GetSection("Colours");
-	if (t != OsSection({}))
+	if (t != defaultSection)
 	{
 		for (auto && f : t.second)
 		{
@@ -223,7 +225,7 @@ void OsuParser::Parse()
 
 	// HIT OBJECTS
 	t = _GetSection("HitObjects");
-	if (t != OsSection({}))
+	if (t != defaultSection)
 	{
 		for (auto && f : t.second)
 		{
@@ -271,7 +273,7 @@ void OsuParser::_ExtractStructure()
 			continue;
 		}
 
-		OsSection section;
+		_OsSection section;
 		section.first = t.substr(1, sz - 2);
 
 		while (true)
@@ -297,7 +299,7 @@ void OsuParser::_ExtractStructure()
 	}
 }
 
-OsSection OsuParser::_GetSection(const std::string & name)
+_OsSection OsuParser::_GetSection(const std::string & name)
 {
 	for (auto && section : _b)
 	{
@@ -311,7 +313,7 @@ OsSection OsuParser::_GetSection(const std::string & name)
 }
 
 template<typename T>
-T OsuParser::_ParseSectionField(const OsSection & section, const string & fieldName, const T & defaultTo)
+T OsuParser::_ParseSectionField(const _OsSection & section, const string & fieldName, const T & defaultTo)
 {
 	for (auto && field : section.second)
 	{
@@ -343,7 +345,7 @@ T OsuParser::_ParseSectionField(const OsSection & section, const string & fieldN
 }
 
 template<typename T>
-vector<T> OsuParser::_ParseSectionFieldAsList(const OsSection & section, const string & fieldName, const string & delim)
+vector<T> OsuParser::_ParseSectionFieldAsList(const _OsSection & section, const string & fieldName, const string & delim)
 {
 	for (auto && field : section.second)
 	{
@@ -513,6 +515,7 @@ HitObject OsuParser::_ParseFieldAsHitObject(const string & field)
 	{
 		o.spinner.isSpinner = true;
 		o.spinner.end = stoll(args[5]);
+		o.spinner.duration = o.spinner.end - o.time;
 	}
 
 	if (o.type == oSlider)
@@ -547,6 +550,7 @@ HitObject OsuParser::_ParseFieldAsHitObject(const string & field)
 		o.slider.nRepeats = (uint8_t)stoi(args[6]);
 		o.slider.length = stod(args[7]);
 		o.slider.duration = (o.slider.length * o.slider.nRepeats) / (100.0 * sliderMultiplier) * timingPoints[_tpIndex].adjustedMsPerBeat;
+		o.slider.end = o.time + o.slider.duration;
 
 		SplitString(args[8], "|", params);
 

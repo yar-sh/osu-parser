@@ -25,35 +25,23 @@ namespace osuParser
 	//   delimiter, string, in what places to split the string
 	//   output, ref vector<string>, all parts of the splitted string
 	// Eg: SplitString("1|2|3,4|5|6", ',', output) -> ["1|2|3","4|5|6"]
-	void SplitString(const std::string & str, const std::string & delim, std::vector<std::string> & output);
+	void SplitString(const std::string & str, const std::string & delimiter, std::vector<std::string> & output);
 
 	// Trims (removes whitespace) passed string
 	//   str, ref string, string to trim
 	void TrimString(std::string & str);
-
-	// Checks if input is active in an input mask
-	//   inputs, InputMask, inputs mask
-	//   input, InputType, input to check if is active
-	// Returns true if input is active in an input mask, false otherwise
-	bool IsInputActive(const InputMask & inputs, const InputType & input);
-
-	// Checks if mod is active in a mod mask
-	//   mods, ModMask, mods mask
-	//   mod, ModType, mod to check if is active
-	// Returns true if mod is active in a mod mask, false otherwise
-	bool IsModActive(const ModMask & mods, const ModType & mod);
 
 	// Decompress LZMA-compressed buffer
 	//   inBuf, vector<uint8_t>, input buffer with LZMA-compressed bytes
 	//   outBuf, ref vector<uint8_t>, output buffer where decompressed data will be written
 	void DecompressLZMA(const std::vector<uint8_t> &inBuf, std::vector<uint8_t> & outBuf);
 
-	// Check to see if two double values are equal
+	// Checks to see if two double values are equal
 	//   a, double, first value to check
 	//   b, double, second value to check
 	// Returns true if both values are equal, false otherwise
 	bool IsEqualDouble(const double & a, const double & b);
-	
+
 	// String names for each available mod
 	const extern std::vector<std::string> _modNames;
 
@@ -65,19 +53,19 @@ namespace osuParser
 
 	// String names for each available beatmap event
 	const extern std::vector<std::string> _eventNames;
-	
+
 	// String names for each available hit sound type
 	const extern std::vector<std::string> _hitSoundNames;
 
 	// String names for each available slider type
 	const extern std::vector<std::string> _sliderNames;
 
-	// Converts any enumerated type value to the string from 
+	// Converts any enumerated type value to the string from
 	// associated vector of string values
 	// <T>: enumerated type
 	//   val, T, value of the enumerated type
 	//   names, vector<string>, dictionary of string values for enum
-	//   defaultTo, string, what to default return value to if there is 
+	//   defaultTo, string, what to default return value to if there is
 	//     no associated string value, defaults to "Unknown"
 	// Returns a string representation of the enumerated type value
 	template<typename T>
@@ -96,7 +84,7 @@ namespace osuParser
 	// <T>: enumerated type
 	//   val, string, string value
 	//   names, vector<string>, dictionary of string values for enum
-	//   defaultTo, T, what to default return value to if there is 
+	//   defaultTo, T, what to default return value to if there is
 	//     no associated enumerated type value, defaults to T(0)
 	// Returns a T representation of the string value
 	template<typename T>

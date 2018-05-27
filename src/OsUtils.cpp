@@ -16,7 +16,7 @@ using namespace std;
 //   delimiter, string, in what places to split the string
 //   output, ref vector<string>, all parts of the splitted string
 // Eg: SplitString("1|2|3,4|5|6", ',', output) -> ["1|2|3","4|5|6"]
-void osuParser::SplitString(const string & str, const string & delim, vector<string> & output)
+void osuParser::SplitString(const string & str, const string & delimiter, vector<string> & output)
 {
 	output.clear();
 
@@ -25,7 +25,7 @@ void osuParser::SplitString(const string & str, const string & delim, vector<str
 
 	while (true)
 	{
-		pos = str.find(delim, prev);
+		pos = str.find(delimiter, prev);
 
 		if (pos == string::npos)
 		{
@@ -34,7 +34,7 @@ void osuParser::SplitString(const string & str, const string & delim, vector<str
 
 		output.push_back(str.substr(prev, pos - prev));
 
-		prev = pos + delim.length();
+		prev = pos + delimiter.length();
 
 		if (pos >= str.length() || prev >= str.length())
 		{
@@ -51,24 +51,6 @@ void osuParser::TrimString(string & str) {
 	}));
 }
 
-// Checks if input is active in an input mask
-//   inputs, InputMask, inputs mask
-//   input, InputType, input to check if is active
-// Returns true if input is active in an input mask, false otherwise
-bool osuParser::IsInputActive(const InputMask & inputs, const InputType & input)
-{
-	return IsBitSet(inputs, input);
-}
-
-// Checks if mod is active in a mod mask
-//   mods, ModMask, mods mask
-//   mod, ModType, mod to check if is active
-// Returns true if mod is active in a mod mask, false otherwise
-bool osuParser::IsModActive(const ModMask & mods, const ModType & mod)
-{
-	return IsBitSet(mods, mod);
-}
-
 // Decompress LZMA-compressed buffer
 //   inBuf, vector<uint8_t>, input buffer with LZMA-compressed bytes
 //   outBuf, ref vector<uint8_t>, output buffer where decompressed data will be written
@@ -83,7 +65,7 @@ void osuParser::DecompressLZMA(const vector<uint8_t> &inBuf, vector<uint8_t> & o
 	outBuf.resize(dstLen);
 }
 
-// Check to see if two double values are equal
+// Checks to see if two double values are equal
 //   a, double, first value to check
 //   b, double, second value to check
 // Returns true if both values are equal, false otherwise

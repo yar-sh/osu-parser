@@ -105,17 +105,20 @@ namespace osuParser
 		// ID of the beatmap set
 		OsInteger beatmapSetID;
 
-		// HP Drain difficulty
+		// HP drain difficulty
 		double hpDrainRate, HP;
 
 		// Size of hit object circles
 		double circleSize, CS;
 
-		// Radius of a circle based on CS in osu! pixels
-		double circleRadiusPx;
-
 		// Amount of time allowed to click a hit object on time
 		double overallDifficulty, OD;
+
+		// Amount of time taken for the approach circle and hit object to appear
+		double approachRate, AR;
+
+		// Radius of a circle based on CS in osu! pixels
+		double circleRadiusPx;
 
 		// How much time is allowed to hit each score
 		OsTime hitWindow300, hitWindow100, hitWindow50;
@@ -123,13 +126,10 @@ namespace osuParser
 		// Harshness of spinners based on OD. Rotations per second required
 		double requiredRPS;
 
-		// Amount of time taken for the approach circle and hit object to appear
-		double approachRate, AR;
-
 		// Amount of time since object's start to fade in to perfect hit
 		OsTime preemptMs;
 
-		// Amount of time it takes for object to completely fade in 
+		// Amount of time it takes for object to completely fade in
 		OsTime fadeInMs;
 
 		// Multiplier for the slider velocity
@@ -141,7 +141,7 @@ namespace osuParser
 		// Events related to background and breaks
 		std::vector<Event> events;
 
-		// Vector of timing points that describe a number of 
+		// Vector of timing points that describe a number of
 		//   properties regarding beats per minute and hit sounds
 		std::vector<TimingPoint> timingPoints;
 
@@ -154,7 +154,7 @@ namespace osuParser
 		// Highest beatmap BPM (lowest msPerBeat)
 		double highestBPM;
 
-		// Average beatmap BPM 
+		// Average beatmap BPM
 		double averageBPM;
 
 		// Vector of the colors of the combos
@@ -167,11 +167,11 @@ namespace osuParser
 		// Methods that extract and parse data from beatmap file
 		void _GetBeatmapVersion();
 		void _ExtractStructure();
-		OsSection _GetSection(const std::string & name = "General");
+		_OsSection _GetSection(const std::string & name = "General");
 		template<typename T>
-		T _ParseSectionField(const OsSection & section, const std::string & fieldName, const T & defaultTo);
+		T _ParseSectionField(const _OsSection & section, const std::string & fieldName, const T & defaultTo);
 		template<typename T>
-		std::vector<T> _ParseSectionFieldAsList(const OsSection & section, const std::string & fieldName, const std::string & delim);
+		std::vector<T> _ParseSectionFieldAsList(const _OsSection & section, const std::string & fieldName, const std::string & delim);
 		Event _ParseFieldAsEvent(const std::string & field);
 		TimingPoint _ParseFieldAsTimingPoint(const std::string & field);
 		RGBAColor _ParseFieldAsRGBAColor(const std::string & field);
@@ -184,7 +184,7 @@ namespace osuParser
 		size_t _tpIndex;
 
 		// Structure of all of the sections of the beatmap with all fields
-		OsBeatmap _b;
+		_OsBeatmap _b;
 
 		// Pointer to the passed data stream in constructor
 		std::istream * _s;

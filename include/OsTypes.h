@@ -32,7 +32,7 @@ namespace osuParser
 	typedef OsByte HitObjectMask;
 	typedef OsByte HitSoundMask;
 
-	// Valid key values. Used in InputMask (OsByte). Enum values represent the bits' number 
+	// Valid input key values. Used in InputMask. Enum values represent the bits' number
 	// that are active in InputMask
 	enum InputType
 	{
@@ -42,7 +42,7 @@ namespace osuParser
 		iKey2 = 3,
 	};
 
-	// Valid mods values. Used in ModMask (OsInteger). Enum values represent the bits' number 
+	// Valid mods values. Used in ModMask. Enum values represent the bits' number
 	// that are active in ModMask
 	enum ModType
 	{
@@ -117,7 +117,7 @@ namespace osuParser
 		oHoldNote = 7,
 	};
 
-	// Valid hit sounds values. Used in HitSoundMask (OsByte). Enum values represent the bits' number 
+	// Valid hit sound values. Used in HitSoundMask. Enum values represent the bits' number
 	// that are active in HitSoundMask
 	enum HitSoundType
 	{
@@ -175,8 +175,8 @@ namespace osuParser
 
 	// A beatmap timing point in [TimingPoints] section
 	//   offset, OsTime, when the timing point starts
-	//   msPerBeat, double, defines the duration of one beat. When positive, it is 
-	//     faithful to its name. When negative, it is a percentage of previous 
+	//   msPerBeat, double, defines the duration of one beat. When positive, it is
+	//     faithful to its name. When negative, it is a percentage of previous
 	//     non-negative milliseconds per beat, which is stored in adjustedMsPerBeat
 	//   adjustedMsPerBeat, double, adjusted duration of each bit based on the sign
 	//     of msPerBeat
@@ -213,11 +213,11 @@ namespace osuParser
 
 	// Additional parameters related to the hit sound samples
 	//   sampleSet, SampleSet, changes the sample set of the normal hit sound
-	//   additionSet, SampleSet, changes the sample set for the other hit 
+	//   additionSet, SampleSet, changes the sample set for the other hit
 	//     sounds (whistle, finish, clap)
 	//   customIndex , uint8_t, custom sample set index
 	//   volume, uint8_t, volume of the sample
-	//   filename, string, names an audio file in the folder to play instead 
+	//   filename, string, names an audio file in the folder to play instead
 	//     of sounds from sample sets
 	struct Extra
 	{
@@ -239,7 +239,7 @@ namespace osuParser
 
 	// Sample sets to apply to the circles of the slider
 	//   sampleSet, SampleSet, changes the sample set of the normal hit sound
-	//   additionSet, SampleSet, changes the sample set for the other hit 
+	//   additionSet, SampleSet, changes the sample set for the other hit
 	//     sounds (whistle, finish, clap)
 	struct EdgeAddition
 	{
@@ -249,24 +249,27 @@ namespace osuParser
 
 	// Information about spinner hit object
 	//   isSpinner, bool, if the hit object is actually a spinner
+	//   duration, OsTime, duration of the spinner
 	//   end, OsTime, when the spinner will end
 	struct SpinnerData
 	{
 		bool isSpinner = false;
+		OsTime duration = 0;
 		OsTime end = 0;
 	};
 
 	// Information about slider hit object
 	//   isSlider, bool, if the hit object is actually a slider
 	//   sliderType, SliderType, type of the slider
-	//   curvePoints, vector of CurvePoint, points of the slider (including initial x and y)
+	//   curvePoints, vector<CurvePoint>, points of the slider (including initial x and y)
 	//   nRepeats, uint8_t, number of slider repeats
 	//   length, double, total length of the slider in osu!pixels
-	//   duration, OsTime, duration of the slider in milliseconds
-	//   edgeHitSounds, vector of HitSoundMask, hit sounds to apply to the circles of the slider
-	//   edgeAdditions, vector of EdgeAddition, samples sets to apply to the circles of the slider
-	//   adjustedEdgeAdditions, vector of EdgeAddition, if for sampleSet or additionSet in edgeAdditions
-	//     value is 0 (or ssAuto) then those values in adjustedEdgeAdditions will be inherited 
+	//   duration, OsTime, duration of the slider
+	//   end, OsTime, when the slider will end
+	//   edgeHitSounds, vector<HitSoundMask>, hit sounds to apply to the circles of the slider
+	//   edgeAdditions, vector<EdgeAddition>, samples sets to apply to the circles of the slider
+	//   adjustedEdgeAdditions, vector<EdgeAddition>, if for sampleSet or additionSet in edgeAdditions
+	//     value is 0 (or ssAuto) then those values in adjustedEdgeAdditions will be inherited
 	//     from the last related timing point (as it says to do so in format docs)
 	struct SliderData
 	{
@@ -276,15 +279,16 @@ namespace osuParser
 		uint8_t nRepeats = 0;
 		double length = 0;
 		OsTime duration = 0;
+		OsTime end = 0;
 		std::vector<HitSoundMask> edgeHitSounds = {};
 		std::vector<EdgeAddition> edgeAdditions = {};
 		std::vector<EdgeAddition> adjustedEdgeAdditions = {};
 	};
-	
+
 	// A beatmap hit object in [HitObjects] section
 	//   x, uint16_t, x position of the center of the hit object in osu!pixels
 	//   y, uint16_t, y position of the center of the hit object in osu!pixels
-	//   time, OsTime, number of milliseconds from the beginning of the song, and 
+	//   time, OsTime, number of milliseconds from the beginning of the song, and
 	//     specifies when the hit begins
 	//   mask, HitObjectMask, bitmap specifying the object type and attributes
 	//   type, HitObjectType, type of the hit object (from bits 0/1/3/7 in mask)
@@ -294,7 +298,7 @@ namespace osuParser
 	//   soundMask, HitSoundMask, sounds to play when the hit object is successfully hit
 	//   extra, Extra, additional parameters related to the hit sound samples
 	//   adjustedExtra, Extra, if for any of sampleSet/additionSet/customIndex in extra
-	//     value is 0 (or ssAuto) then those values in adjustedExtra will be inherited 
+	//     value is 0 (or ssAuto) then those values in adjustedExtra will be inherited
 	//     from the last related timing point (as it says to do so in format docs)
 	//   spinner, SpinnerData, spinner information (if type==oSpinner)
 	//   slider, SliderData, slider information (if type==oSlider)

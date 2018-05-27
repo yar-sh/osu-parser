@@ -17,10 +17,6 @@ Parse any osu! related file *(in theory. Right now only \*.osr (replays) and \*.
     - [Parse `*.osr`](#osr)
     - [Parse `*.osu`](#osu)
 - [Documentation](#documentation)
-    - [Types](#types)
-    - [Utils](#utils)
-    - [OsrParser](#osrparser)
-    - [OsuParser](#osuparser)
 - [TODO](#todo)
  
   

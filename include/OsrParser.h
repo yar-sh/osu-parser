@@ -28,7 +28,7 @@ namespace osuParser
 
 		// Game mode of the replay
 		GameMode mode;
-		
+
 		// Version of the game where the replay was created
 		OsLong version;
 
@@ -65,25 +65,25 @@ namespace osuParser
 		// Greatest combo displayed on the score report
 		OsShort combo;
 
-		// Perfect/full combo (1 = no misses and no slider breaks and no early finished sliders)
+		// Perfect/full combo (true = no misses and no slider breaks and no early finished sliders)
 		bool isFC;
 
-		// Mods used. See IsModActive and ModType
+		// Mods used in a mask form
 		ModMask modsMask;
 
 		// Mods used in a vector of ModType
 		std::vector<ModType> modsVector;
-		
+
 		// Life bar graph. Represents the amount of life you have at the given time
 		std::vector<LifeBarPoint> lifebar;
 
 		// Time stamp (https://msdn.microsoft.com/en-us/library/system.datetime.ticks(v=vs.110).aspx)
 		OsLong timestamp;
 
-		// Vector of actions. See Action struct
+		// Vector of of replay actions
 		std::vector<Action> actions;
 
-		// Last 4 bytes of replay file - unknown
+		// Last 4 bytes of replay file - unknown, usually 00 00 00 00
 		OsLong unknown;
 
 	private:
