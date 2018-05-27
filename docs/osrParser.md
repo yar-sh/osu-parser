@@ -1,5 +1,5 @@
 ## OsrParser
-Please refer to Refer to [osr file format documentation](https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osr_(file_format)) for more details
+Please refer to [osr file format documentation](https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osr_(file_format)) for more details
 * constructor **OsrParser(stream)**: Constructs an object for parsing "\*.osr" files from input stream
     - *stream*, **istream**, input data stream
 * void **Parse()**: Goes through istream and reads all data

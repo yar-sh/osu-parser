@@ -1,5 +1,5 @@
 ## OsuParser
-Please refer to Refer to [osu file format documentation](https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osu_(file_format)) for more details
+Please refer to [osu file format documentation](https://osu.ppy.sh/help/wiki/osu!_File_Formats/Osu_(file_format)) for more details
 * constructor **OsuParser(stream)**: Constructs an object for parsing "\*.osu" files from input stream
     - *stream*, **istream**, input data stream
 * void **Parse()**: Goes through istream and reads all data
