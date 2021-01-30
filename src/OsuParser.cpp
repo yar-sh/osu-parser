@@ -276,7 +276,7 @@ void OsuParser::_ExtractStructure()
 		_OsSection section;
 		section.first = t.substr(1, sz - 2);
 
-		while (true)
+		while (!_s->eof() && !_s->fail())
 		{
 			getline(*_s, t);
 			TrimString(t);
