@@ -326,6 +326,9 @@ T OsuParser::_ParseSectionField(const _OsSection & section, const string & field
 		if (size_t len = f.find(':'); len != string::npos)
 		{
 			f.erase(0, len + 1);
+            
+            while (f[0] == ' ') //remove whitespaces at the beginning
+				f.erase(0, 1);
 
 			// OH BOY, LOOK, THIS RANDOM constexpr OVER HERE MAKES IT WORK
 			if constexpr (is_same_v<T, string>)
@@ -358,6 +361,9 @@ vector<T> OsuParser::_ParseSectionFieldAsList(const _OsSection & section, const 
 		if (size_t len = f.find(':'); len != string::npos)
 		{
 			f.erase(0, len + 1);
+            
+            while (f[0] == ' ') //remove whitespaces at the beginning
+				f.erase(0, 1);
 
 			vector<string> listValues;
 			vector<T> listT;
