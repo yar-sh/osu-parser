@@ -7,12 +7,13 @@
 ////////////////////////////////////////////////////////////////
 
 #include "OsrParser.h"
+#include <fstream>
 
 using namespace std;
 using namespace osuParser;
 
 // Creates a parser from input data stream
-OsrParser::OsrParser(istream * stream)
+OsrParser::OsrParser(istream* stream)
 {
 	_s = stream;
 	mode = gmStandard;
@@ -44,7 +45,7 @@ void OsrParser::Parse()
 	_s->seekg(0);
 
 	mode = static_cast<GameMode>(_GetStreamByte());
-	
+
 	version = _GetStreamInteger();
 
 	beatmapHash = _GetStreamString();
@@ -74,7 +75,7 @@ void OsrParser::Parse()
 	modsMask = _GetStreamInteger();
 
 	_CalcModsVector();
-	
+
 	_CalcLifebar();
 
 	timestamp = _GetStreamLong();
@@ -97,7 +98,7 @@ uint8_t OsrParser::_GetStreamByte()
 uint16_t OsrParser::_GetStreamShort()
 {
 	uint16_t b = 0;
-	_s->read((char *)&b, sizeof(uint16_t));
+	_s->read((char*)&b, sizeof(uint16_t));
 	return b;
 }
 
@@ -106,7 +107,7 @@ uint32_t OsrParser::_GetStreamInteger()
 	uint32_t b = 0;
 
 	// Requires explicit conversion to read bytes
-	_s->read((char *)&b, sizeof(uint32_t)); //-V206
+	_s->read((char*)&b, sizeof(uint32_t)); //-V206
 	return b;
 }
 
@@ -115,7 +116,7 @@ uint64_t OsrParser::_GetStreamLong()
 	uint64_t b = 0;
 
 	// Requires explicit conversion to read bytes
-	_s->read((char *)&b, sizeof(uint64_t)); //-V206
+	_s->read((char*)&b, sizeof(uint64_t)); //-V206
 	return b;
 }
 
@@ -176,7 +177,7 @@ void OsrParser::_CalcLifebar()
 	vector<string> chunks;
 	SplitString(data, ",", chunks);
 
-	for (auto && chunk : chunks)
+	for (auto&& chunk : chunks)
 	{
 		vector<string> values;
 		SplitString(chunk, "|", values);
@@ -186,7 +187,7 @@ void OsrParser::_CalcLifebar()
 			lifebar.push_back({
 				atoll(values[0].c_str()),
 				strtod(values[1].c_str(), nullptr)
-			});
+				});
 		}
 	}
 }
@@ -204,7 +205,7 @@ void OsrParser::_CalcActions()
 	vector<string> chunks;
 	SplitString({ decompressedBytes.begin(), decompressedBytes.end() }, ",", chunks);
 
-	for (auto && chunk : chunks)
+	for (auto&& chunk : chunks)
 	{
 		vector<string> values;
 		SplitString(chunk, "|", values);
@@ -222,7 +223,7 @@ void OsrParser::_CalcActions()
 				stod(values[1].c_str(), nullptr),
 				stod(values[2].c_str(), nullptr),
 				(uint8_t)strtoul(values[3].c_str(), nullptr, 10),
-			});
+				});
 		}
 	}
 }

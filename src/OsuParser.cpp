@@ -12,7 +12,7 @@ using namespace std;
 using namespace osuParser;
 
 // Creates a parser from istream
-OsuParser::OsuParser(istream * stream)
+OsuParser::OsuParser(istream* stream)
 {
 	_s = stream;
 	formatVersion = 0;
@@ -43,16 +43,16 @@ OsuParser::OsuParser(istream * stream)
 	beatmapSetID = 0;
 	hpDrainRate = 0.0;
 	HP = 0.0;
-	circleSize = 0.0; 
+	circleSize = 0.0;
 	CS = 0.0;
 	circleRadiusPx = 0.0;
-	overallDifficulty = 0.0; 
+	overallDifficulty = 0.0;
 	OD = 0.0;
 	hitWindow300 = 0;
-	hitWindow100 = 0; 
+	hitWindow100 = 0;
 	hitWindow50 = 0;
 	requiredRPS = 0.0;
-	approachRate = 0.0; 
+	approachRate = 0.0;
 	AR = 0.0;
 	preemptMs = 0;
 	fadeInMs = 0;
@@ -156,7 +156,7 @@ void OsuParser::Parse()
 		circleRadiusPx = 54.4 - 4.48 * CS;
 
 		hitWindow300 = 80.0 - 6.0 * OD;
-		hitWindow100 = 140.0 - 8.0 * OD; 
+		hitWindow100 = 140.0 - 8.0 * OD;
 		hitWindow50 = 200.0 - 10.0 * OD;
 
 		requiredRPS = (OD < 5.0 || IsEqualDouble(OD, 5.0))
@@ -168,7 +168,7 @@ void OsuParser::Parse()
 	t = _GetSection("Events");
 	if (t != defaultSection)
 	{
-		for (auto && f : t.second)
+		for (auto&& f : t.second)
 		{
 			if (Event e = _ParseFieldAsEvent(f); e.type != eUnknown)
 			{
@@ -181,7 +181,7 @@ void OsuParser::Parse()
 	t = _GetSection("TimingPoints");
 	if (t != defaultSection)
 	{
-		for (auto && f : t.second)
+		for (auto&& f : t.second)
 		{
 			timingPoints.push_back(_ParseFieldAsTimingPoint(f));
 		}
@@ -190,7 +190,7 @@ void OsuParser::Parse()
 		highestBPM = -1234567.0;
 		averageBPM = 0.0;
 
-		for (auto && msPerBeat : msPerBeats)
+		for (auto&& msPerBeat : msPerBeats)
 		{
 			double bpm = 60000.0 / msPerBeat;
 
@@ -198,7 +198,7 @@ void OsuParser::Parse()
 			{
 				highestBPM = bpm;
 			}
-			
+
 			if (bpm < lowestBPM)
 			{
 				lowestBPM = bpm;
@@ -209,12 +209,12 @@ void OsuParser::Parse()
 
 		averageBPM /= (double)msPerBeats.size();
 	}
-	
+
 	// COLORS
 	t = _GetSection("Colours");
 	if (t != defaultSection)
 	{
-		for (auto && f : t.second)
+		for (auto&& f : t.second)
 		{
 			// Hmmm... so apparently there are "Special coloUrs" for slider
 			// TODO (not a priority) them some time 
@@ -227,7 +227,7 @@ void OsuParser::Parse()
 	t = _GetSection("HitObjects");
 	if (t != defaultSection)
 	{
-		for (auto && f : t.second)
+		for (auto&& f : t.second)
 		{
 			hitObjects.push_back(_ParseFieldAsHitObject(f));
 		}
@@ -245,7 +245,7 @@ void OsuParser::_GetBeatmapVersion()
 	{
 		fileVersionString.erase(0, len + 1);
 		formatVersion = stoi(fileVersionString);
-		
+
 		return;
 	}
 
@@ -276,7 +276,7 @@ void OsuParser::_ExtractStructure()
 		_OsSection section;
 		section.first = t.substr(1, sz - 2);
 
-		while (true)
+		while (!_s->eof() && !_s->fail())
 		{
 			getline(*_s, t);
 			TrimString(t);
@@ -299,11 +299,11 @@ void OsuParser::_ExtractStructure()
 	}
 }
 
-_OsSection OsuParser::_GetSection(const std::string & name)
+_OsSection OsuParser::_GetSection(const std::string& name)
 {
-	for (auto && section : _b)
+	for (auto&& section : _b)
 	{
-		if (section.first == name) 
+		if (section.first == name)
 		{
 			return section;
 		}
@@ -313,9 +313,9 @@ _OsSection OsuParser::_GetSection(const std::string & name)
 }
 
 template<typename T>
-T OsuParser::_ParseSectionField(const _OsSection & section, const string & fieldName, const T & defaultTo)
+T OsuParser::_ParseSectionField(const _OsSection& section, const string& fieldName, const T& defaultTo)
 {
-	for (auto && field : section.second)
+	for (auto&& field : section.second)
 	{
 		if (field.find(fieldName) == string::npos)
 		{
@@ -326,6 +326,9 @@ T OsuParser::_ParseSectionField(const _OsSection & section, const string & field
 		if (size_t len = f.find(':'); len != string::npos)
 		{
 			f.erase(0, len + 1);
+
+			while (f[0] == ' ') //remove whitespaces at the beginning
+				f.erase(0, 1);
 
 			// OH BOY, LOOK, THIS RANDOM constexpr OVER HERE MAKES IT WORK
 			if constexpr (is_same_v<T, string>)
@@ -345,9 +348,9 @@ T OsuParser::_ParseSectionField(const _OsSection & section, const string & field
 }
 
 template<typename T>
-vector<T> OsuParser::_ParseSectionFieldAsList(const _OsSection & section, const string & fieldName, const string & delim)
+vector<T> OsuParser::_ParseSectionFieldAsList(const _OsSection& section, const string& fieldName, const string& delim)
 {
-	for (auto && field : section.second)
+	for (auto&& field : section.second)
 	{
 		if (field.find(fieldName) == string::npos)
 		{
@@ -359,11 +362,14 @@ vector<T> OsuParser::_ParseSectionFieldAsList(const _OsSection & section, const 
 		{
 			f.erase(0, len + 1);
 
+			while (f[0] == ' ') //remove whitespaces at the beginning
+				f.erase(0, 1);
+
 			vector<string> listValues;
 			vector<T> listT;
 			SplitString(f, delim, listValues);
 
-			for (auto && val : listValues)
+			for (auto&& val : listValues)
 			{
 				if constexpr (is_same_v<T, std::string>)
 				{
@@ -384,7 +390,7 @@ vector<T> OsuParser::_ParseSectionFieldAsList(const _OsSection & section, const 
 	return {};
 }
 
-Event OsuParser::_ParseFieldAsEvent(const string & field)
+Event OsuParser::_ParseFieldAsEvent(const string& field)
 {
 	string f = field;
 
@@ -408,7 +414,7 @@ Event OsuParser::_ParseFieldAsEvent(const string & field)
 	return { eUnknown };
 }
 
-TimingPoint OsuParser::_ParseFieldAsTimingPoint(const string & field)
+TimingPoint OsuParser::_ParseFieldAsTimingPoint(const string& field)
 {
 	string f = field;
 
@@ -441,7 +447,7 @@ TimingPoint OsuParser::_ParseFieldAsTimingPoint(const string & field)
 	return tp;
 }
 
-RGBAColor OsuParser::_ParseFieldAsRGBAColor(const string & field)
+RGBAColor OsuParser::_ParseFieldAsRGBAColor(const string& field)
 {
 	string f = field; //-V808
 
@@ -462,7 +468,7 @@ RGBAColor OsuParser::_ParseFieldAsRGBAColor(const string & field)
 	return {};
 }
 
-HitObject OsuParser::_ParseFieldAsHitObject(const string & field)
+HitObject OsuParser::_ParseFieldAsHitObject(const string& field)
 {
 	string f = field;
 
@@ -470,7 +476,7 @@ HitObject OsuParser::_ParseFieldAsHitObject(const string & field)
 	SplitString(f, ",", args);
 
 	HitObject o;
-	
+
 	o.x = (uint16_t)stoi(args[0]);
 	o.y = (uint16_t)stoi(args[1]);
 	o.time = stoll(args[2]);
@@ -480,17 +486,17 @@ HitObject OsuParser::_ParseFieldAsHitObject(const string & field)
 	{
 		o.type = oCircle;
 	}
-	
+
 	if (IsBitSet(o.mask, 1))
 	{
 		o.type = oSlider;
-	} 
-	
+	}
+
 	if (IsBitSet(o.mask, 3))
 	{
 		o.type = oSpinner;
-	} 
-	
+	}
+
 	if (IsBitSet(o.mask, 7))
 	{
 		o.type = oHoldNote;
@@ -536,7 +542,7 @@ HitObject OsuParser::_ParseFieldAsHitObject(const string & field)
 		vector<string> params;
 		SplitString(args[5], "|", params);
 
-		for (auto && p : params)
+		for (auto&& p : params)
 		{
 			vector<string> values;
 			SplitString(p, ":", values);
@@ -544,7 +550,7 @@ HitObject OsuParser::_ParseFieldAsHitObject(const string & field)
 			o.slider.curvePoints.push_back({
 				(uint16_t)stoi(values[0]),
 				(uint16_t)stoi(values[1]),
-			});
+				});
 		}
 
 		o.slider.nRepeats = (uint8_t)stoi(args[6]);
@@ -552,31 +558,43 @@ HitObject OsuParser::_ParseFieldAsHitObject(const string & field)
 		o.slider.duration = (o.slider.length * o.slider.nRepeats) / (100.0 * sliderMultiplier) * timingPoints[_tpIndex].adjustedMsPerBeat;
 		o.slider.end = o.time + o.slider.duration;
 
-		SplitString(args[8], "|", params);
+		if (args.size() > 9) { //there might be incomplete slider hitobjects
+			SplitString(args[8], "|", params);
 
-		for (size_t i = 0; i < params.size(); i++)
-		{
-			o.slider.edgeHitSounds.push_back((HitSoundMask)stoi(params[i]));
+			for (size_t i = 0; i < params.size(); i++)
+			{
+				o.slider.edgeHitSounds.push_back((HitSoundMask)stoi(params[i]));
+			}
+
+			SplitString(args[9], "|", params);
+
+			for (size_t i = 0; i < params.size(); i++)
+			{
+				vector<string> values;
+				SplitString(params[i], ":", values);
+
+				o.slider.curvePoints.push_back({
+					(uint16_t)stoi(values[0]),
+					(uint16_t)stoi(values[1]),
+					});
+			}
 		}
+		else {
+			for (int i = 0; i < 2; i++) {
+				o.slider.edgeHitSounds.push_back((HitSoundMask)0);
 
-		SplitString(args[9], "|", params);
-
-		for (size_t i = 0; i < params.size(); i++)
-		{
-			vector<string> values;
-			SplitString(params[i], ":", values);
-
-			o.slider.curvePoints.push_back({
-				(uint16_t)stoi(values[0]),
-				(uint16_t)stoi(values[1]),
-				});
+				o.slider.curvePoints.push_back({
+						(uint16_t)0,
+						(uint16_t)0,
+					});
+			}
 		}
 	}
 
 	return o;
 }
 
-void OsuParser::_ExtractExtras(const string & s, HitObject & o)
+void OsuParser::_ExtractExtras(const string& s, HitObject& o)
 {
 	vector<string> params;
 	SplitString(s, ":", params);
@@ -605,7 +623,7 @@ void OsuParser::_ExtractExtras(const string & s, HitObject & o)
 		_tpIndex++;
 	}
 
-	const TimingPoint & tp = timingPoints[_tpIndex];
+	const TimingPoint& tp = timingPoints[_tpIndex];
 
 	if (o.extra.sampleSet == ssAuto)
 	{
