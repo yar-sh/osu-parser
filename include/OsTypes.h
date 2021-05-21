@@ -10,6 +10,7 @@
 #define OSU_PARSER_TYPES_H
 
 #include <vector>
+#include <string>
 
 #define LIFE_BAR_POINT_LENGTH 2
 #define ACTION_LENGTH 4
